@@ -1,0 +1,12 @@
+{
+  "name": "tactic",
+  "version": "0.0.3",
+  "description": "Tactically superior interfacing and supreme command-line analysis provide dynamic options to a better future.",
+  "main": "command.js",
+  "dependencies": {
+    "config.json": "0.0.4",
+    "discord.js": "^11.0.0"
+  },
+  "author": "Commander Williams",
+  "license": "ISC"
+}
