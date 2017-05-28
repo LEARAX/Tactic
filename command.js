@@ -11,7 +11,7 @@ bot.on('ready', () => {
 });
 
 bot.on('message', message => {
-  if (message.author.username !== 'Tact' || message.author.username !== 'Arco' || message.author.username !== 'SLAVE_1') {
+  if (message.author.bot == false) {
     console.log('Message detected.');
     console.log('Time: ' + Date());
     console.log('From: ' + message.author.username);
