@@ -37,7 +37,7 @@ bot.on('message', message => {
             var gameList = gameList + '[' + i + ']  ' + games[i] + '\n';
           }
           console.log('Game List: ' + gameList);
-          message.channel.sendMessage(gameList,{code: true, split: true});
+          message.channel.send(gameList,{code: true, split: true});
         }else if (dividedCommand[0] == 'run') {
           console.log('\'run\' command detected.');
           var gameID = parseInt(dividedCommand[1]);
@@ -46,9 +46,9 @@ bot.on('message', message => {
             console.log('Frozen Syncord Initiated.');
             var Player1 = message.author.username;
             console.log('Player 1: ' + Player1);
-            message.channel.sendMessage('**WELCOME TO:**');
-            message.channel.sendMessage(' _____                        _____                       _ \n|   __|___ ___ ___ ___ ___   |   __|_ _ ___ ___ ___ ___ _| |\n|   __|  _| . |- _| -_|   |  |__   | | |   |  _| . |  _| . |\n|__|  |_| |___|___|___|_|_|  |_____|_  |_|_|___|___|_| |___|\n                                   |___|                    ',{code: true});
-            message.channel.sendMessage('ENTER LAUNCH SETTINGS');
+            message.channel.send('**WELCOME TO:**');
+            message.channel.send(' _____                        _____                       _ \n|   __|___ ___ ___ ___ ___   |   __|_ _ ___ ___ ___ ___ _| |\n|   __|  _| . |- _| -_|   |  |__   | | |   |  _| . |  _| . |\n|__|  |_| |___|___|___|_|_|  |_____|_  |_|_|___|___|_| |___|\n                                   |___|                    ',{code: true});
+            message.channel.send('ENTER LAUNCH SETTINGS');
             var launchSettingsInput = true;
           }
           var launchSettings = message.content;
@@ -64,13 +64,13 @@ bot.on('message', message => {
           }
 
 
-          //message.channel.sendMessage('Player 1 -- Player 2 \n.............................................................\n.............................................................\n.............................................................\n.............................................................\n.............................................................\n.............................................................\n.............................................................\n.............................................................\n.............................................................\n.............................................................\n',{code: true,split: true})
+          //message.channel.send('Player 1 -- Player 2 \n.............................................................\n.............................................................\n.............................................................\n.............................................................\n.............................................................\n.............................................................\n.............................................................\n.............................................................\n.............................................................\n.............................................................\n',{code: true,split: true})
         }else if (games[gameID] == 'Tic-Tac-Toe') {
           console.log('Tic-Tac-Toe Initiated.');
           var Player1 = message.author.username;
           console.log('Player 1: ' + Player1);
           var Tiles = [' ', ' ',' ',' ',' ',' ',' ',' ',' '];
-          message.channel.sendMessage('Tic-Tac-Toe Initiated!');
+          message.channel.send('Tic-Tac-Toe Initiated!');
           message.reply('Who is player 2?');
           message.channel.startTyping();
           console.log(message)
