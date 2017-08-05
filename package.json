@@ -5,8 +5,7 @@
   "main": "command.js",
   "dependencies": {
     "config.json": "^0.0.4",
-    "discord.js": "^11.0.0",
-    "embed-creator": "^1.1.4"
+    "discord.js": "^11.0.0"
   },
   "repository": {
     "type": "git",
