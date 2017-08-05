@@ -58,48 +58,83 @@ bot.on('message', message => {
 
       case 'run':
       switch (commandInputSplit[1]) {
-        case 0:
+        case '0':
+        // TODO
         break;
 
-        case 1:
-        break;
+        case '1':
+        console.log('Player ' + message.author.username + ' has selected Tic-Tac-Toe...');
+        var Player1 = message.author.id
+        message.reply('1 or 2 players?');
+        channel.awaitMessages(m.author.id == Player1, { max: 1, time: 60000, errors: ['time'] })
+        .then(
+          switch (m.content) {
+            case '1':
+            console.log('Single-player mode selected');
+            break;
 
-        default:
-        message.channel.send({embed: {
-          color: 0xff0000,
-          author: {
-            name: bot.user.username,
-            icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-          },
-          title: 'Error Handler',
-          url: 'https://github.com/The-Complex/Tactic',
-          fields: [{
-            name: 'UNRECOGNIZED PROGRAM',
-            value: 'Program ID "' + commandInputSplit[1] + '" was unrecognized.'
-          }],
+            case '2':
+            console.log('2 player mode selected');
+            break;
+
+            default:
+            message.channel.send({embed: {
+              color: 0xff0000,
+              author: {
+                name: bot.user.username,
+                icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+              },
+              title: 'Error Handler',
+              url: 'https://github.com/The-Complex/Tactic',
+              fields: [{
+                name: 'INVALID NUMBER OF PLAYER',
+                value: 'Unrecognized value "' + m.content + '". Please enter "1" or "2".'
+              }],
+            }
+          });
         }
-      });
-    };
-    break;
+        var gameState = {
+          'Player1': Player1,
+          'Mode': }
+        );
+        .catch(
+          console.log('No response within a minute. Aborting...');
+          message.channel.send({embed: {
+            color: 0xff0000,
+            author: {
+              name: bot.user.username,
+              icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+            },
+            title: 'Error Handler',
+            url: 'https://github.com/The-Complex/Tactic',
+            fields: [{
+              name: 'NO RESPONSE RECEIVED',
+              value: 'No response was received within a minute: aborting...'
+            }],
+          }
+        });
+      );
+      break;
 
-    case '':
-    message.channel.send({embed: {
-      color: 0xff0000,
-      author: {
-        name: bot.user.username,
-        icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-      },
-      title: 'Error Handler',
-      url: 'https://github.com/The-Complex/Tactic',
-      fields: [{
-        name: 'COMMAND INVALID',
-        value: 'Please enter a command!'
-      }],
-    }
-  });
+      default:
+      message.channel.send({embed: {
+        color: 0xff0000,
+        author: {
+          name: bot.user.username,
+          icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+        },
+        title: 'Error Handler',
+        url: 'https://github.com/The-Complex/Tactic',
+        fields: [{
+          name: 'UNRECOGNIZED PROGRAM',
+          value: 'Program ID "' + commandInputSplit[1] + '" was unrecognized.'
+        }],
+      }
+    });
+  };
   break;
 
-  default:
+  case '':
   message.channel.send({embed: {
     color: 0xff0000,
     author: {
@@ -110,9 +145,26 @@ bot.on('message', message => {
     url: 'https://github.com/The-Complex/Tactic',
     fields: [{
       name: 'COMMAND INVALID',
-      value: 'Your command "' + commandInputSplit[0] + '" was unrecognized.'
+      value: 'Please enter a command!'
     }],
   }
+});
+break;
+
+default:
+message.channel.send({embed: {
+  color: 0xff0000,
+  author: {
+    name: bot.user.username,
+    icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+  },
+  title: 'Error Handler',
+  url: 'https://github.com/The-Complex/Tactic',
+  fields: [{
+    name: 'COMMAND INVALID',
+    value: 'Your command "' + commandInputSplit[0] + '" was unrecognized.'
+  }],
+}
 });
 };
 };
