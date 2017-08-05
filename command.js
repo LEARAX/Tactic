@@ -55,8 +55,10 @@ bot.on('message', message => {
         }
       });
       break;
+
       case 'run':
       break;
+
       case '':
       message.channel.send({embed: {
         color: 0xff0000,
@@ -73,6 +75,7 @@ bot.on('message', message => {
       }
     })
     break;
+
     default:
     message.channel.send({embed: {
       color: 0xff0000,
