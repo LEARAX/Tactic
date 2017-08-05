@@ -64,23 +64,23 @@ bot.on('message', message => {
         }],
       }
     })
-      break;
-      default:
-      message.channel.send({embed: {
-        color: 0xff0000,
-        author: {
-          name: bot.user.username,
-          icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-        },
-        title: 'Error Handler',
-        url: 'https://github.com/The-Complex/Tactic',
-        fields: [{
-          name: 'COMMAND INVALID',
-          value: 'Your command "' + commandInputSplit[0] + '" was unrecognized.'
-        }],
-      }
-    })
-  };
+    break;
+    default:
+    message.channel.send({embed: {
+      color: 0xff0000,
+      author: {
+        name: bot.user.username,
+        icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+      },
+      title: 'Error Handler',
+      url: 'https://github.com/The-Complex/Tactic',
+      fields: [{
+        name: 'COMMAND INVALID',
+        value: 'Your command "' + commandInputSplit[0] + '" was unrecognized.'
+      }],
+    }
+  })
+};
 };
 };
 });
