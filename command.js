@@ -57,26 +57,32 @@ bot.on('message', message => {
       break;
 
       case 'run':
-      break;
+      switch (commandInputSplit[1]) {
+        case 0:
+        break;
 
-      case '':
-      message.channel.send({embed: {
-        color: 0xff0000,
-        author: {
-          name: bot.user.username,
-          icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-        },
-        title: 'Error Handler',
-        url: 'https://github.com/The-Complex/Tactic',
-        fields: [{
-          name: 'COMMAND INVALID',
-          value: 'Please enter a command!'
-        }],
-      }
-    })
+        case 1:
+        break;
+
+        default:
+        message.channel.send({embed: {
+          color: 0xff0000,
+          author: {
+            name: bot.user.username,
+            icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+          },
+          title: 'Error Handler',
+          url: 'https://github.com/The-Complex/Tactic',
+          fields: [{
+            name: 'UNRECOGNIZED PROGRAM',
+            value: 'Program ID "' + commandInputSplit[1] + '" was unrecognized.'
+          }],
+        }
+      });
+    };
     break;
 
-    default:
+    case '':
     message.channel.send({embed: {
       color: 0xff0000,
       author: {
@@ -87,10 +93,27 @@ bot.on('message', message => {
       url: 'https://github.com/The-Complex/Tactic',
       fields: [{
         name: 'COMMAND INVALID',
-        value: 'Your command "' + commandInputSplit[0] + '" was unrecognized.'
+        value: 'Please enter a command!'
       }],
     }
-  })
+  });
+  break;
+
+  default:
+  message.channel.send({embed: {
+    color: 0xff0000,
+    author: {
+      name: bot.user.username,
+      icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+    },
+    title: 'Error Handler',
+    url: 'https://github.com/The-Complex/Tactic',
+    fields: [{
+      name: 'COMMAND INVALID',
+      value: 'Your command "' + commandInputSplit[0] + '" was unrecognized.'
+    }],
+  }
+});
 };
 };
 };
