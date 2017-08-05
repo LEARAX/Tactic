@@ -5,6 +5,10 @@ const fs = require('fs');
 const config = require('config.json')('./secrets.json');
 const token = config.token;
 
+bot.on('disconnect', event => {
+  console.log('!Disconnected: ' + event.reason + ' (' + event.code + ')!');
+});
+
 bot.on('ready', () => {
   console.log('╦═╗┌─┐┌─┐┌┬┐┬ ┬┬\n╠╦╝├┤ ├─┤ ││└┬┘│\n╩╚═└─┘┴ ┴─┴┘ ┴ o');
 });
@@ -16,11 +20,15 @@ bot.on('message', message => {
     console.log('From: ' + message.author.username);
     console.log('Message: ' + message.content);
     console.log('Length: ' + message.content.length);
+
+
     if (message.content.slice(0,2) == '*$') {
+
       console.log('Command detected.');
       const commandInput = message.content.slice(2);
       const commandInputSplit = commandInput.split(' ');
       console.log('Command: ' + commandInput);
+
       switch (commandInputSplit[0]) {
         case 'ls':
         case 'list':
