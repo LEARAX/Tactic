@@ -5,6 +5,7 @@ const fs = require('fs');
 const config = require('config.json')('./secrets.json');
 const token = config.token;
 
+
 bot.on('disconnect', event => {
   console.log('!Disconnected: ' + event.reason + ' (' + event.code + ')!');
 });
@@ -28,6 +29,11 @@ bot.on('message', message => {
       const commandInput = message.content.slice(2);
       const commandInputSplit = commandInput.split(' ');
       console.log('Command: ' + commandInput);
+
+      var gameState = JSON.parse(fs.readFileSync('Game State.json', 'utf8'));
+      console.log('Gamestate parsed.');
+      console.log('Gamestate: ' + gameState);
+
 
       switch (commandInputSplit[0]) {
         case 'ls':
@@ -64,90 +70,77 @@ bot.on('message', message => {
 
         case '1':
         console.log('Player ' + message.author.username + ' has selected Tic-Tac-Toe...');
-        var Player1 = message.author.id
+        var Player1 = message.author;
+        var gameState = {'Player1': Player1, 'Game': commandInputSplit[1], 'awaitingPlayerCount': true};
         message.reply('1 or 2 players?');
-        channel.awaitMessages(m.author.id == Player1, { max: 1, time: 60000, errors: ['time'] })
-        .then(
-          switch (m.content) {
-            case '1':
-            console.log('Single-player mode selected');
-            break;
+        fs.writeFileSync('Game State.json', JSON.stringify(gameState), 'utf8');
+        console.log('Game state stored.');
+        break;
 
-            case '2':
-            console.log('2 player mode selected');
-            break;
+        
+        /*  switch (m.content) {
+        case '1':
+        console.log('Single-player mode selected');
+        break;
 
-            default:
-            message.channel.send({embed: {
-              color: 0xff0000,
-              author: {
-                name: bot.user.username,
-                icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-              },
-              title: 'Error Handler',
-              url: 'https://github.com/The-Complex/Tactic',
-              fields: [{
-                name: 'INVALID NUMBER OF PLAYER',
-                value: 'Unrecognized value "' + m.content + '". Please enter "1" or "2".'
-              }],
-            }
-          });
-        }
-        var gameState = {
-          'Player1': Player1,
-          'Mode': }
-        );
-        .catch(
-          console.log('No response within a minute. Aborting...');
-          message.channel.send({embed: {
-            color: 0xff0000,
-            author: {
-              name: bot.user.username,
-              icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-            },
-            title: 'Error Handler',
-            url: 'https://github.com/The-Complex/Tactic',
-            fields: [{
-              name: 'NO RESPONSE RECEIVED',
-              value: 'No response was received within a minute: aborting...'
-            }],
-          }
-        });
-      );
-      break;
+        case '2':
+        console.log('2 player mode selected');
+        break;
 
-      default:
-      message.channel.send({embed: {
+        default:
+        message.channel.send({embed: {
         color: 0xff0000,
         author: {
-          name: bot.user.username,
-          icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-        },
-        title: 'Error Handler',
-        url: 'https://github.com/The-Complex/Tactic',
-        fields: [{
-          name: 'UNRECOGNIZED PROGRAM',
-          value: 'Program ID "' + commandInputSplit[1] + '" was unrecognized.'
-        }],
-      }
-    });
-  };
-  break;
-
-  case '':
-  message.channel.send({embed: {
-    color: 0xff0000,
-    author: {
-      name: bot.user.username,
-      icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-    },
-    title: 'Error Handler',
-    url: 'https://github.com/The-Complex/Tactic',
-    fields: [{
-      name: 'COMMAND INVALID',
-      value: 'Please enter a command!'
+        name: bot.user.username,
+        icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+      },
+      title: 'Error Handler',
+      url: 'https://github.com/The-Complex/Tactic',
+      fields: [{
+      name: 'INVALID NUMBER OF PLAYER',
+      value: 'Unrecognized value "' + m.content + '". Please enter "1" or "2".'
     }],
   }
+});
+}
+var gameState = {
+'Player1': Player1,
+'Mode': }
+);*/
+
+
+default:
+message.channel.send({embed: {
+  color: 0xff0000,
+  author: {
+    name: bot.user.username,
+    icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+  },
+  title: 'Error Handler',
+  url: 'https://github.com/The-Complex/Tactic',
+  fields: [{
+    name: 'UNRECOGNIZED PROGRAM',
+    value: 'Program ID "' + commandInputSplit[1] + '" was unrecognized.'
+  }],
+}
+});
+};
+break;
+
+case '':
+message.channel.send({embed: {
+  color: 0xff0000,
+  author: {
+    name: bot.user.username,
+    icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+  },
+  title: 'Error Handler',
+  url: 'https://github.com/The-Complex/Tactic',
+  fields: [{
+    name: 'COMMAND INVALID',
+    value: 'Please enter a command!'
+  }],
+}
 });
 break;
 
@@ -167,6 +160,7 @@ message.channel.send({embed: {
 }
 });
 };
+message.delete();
 };
 };
 });
