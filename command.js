@@ -32,7 +32,7 @@ bot.on('message', message => {
 
       var gameState = JSON.parse(fs.readFileSync('Game State.json', 'utf8'));
       console.log('Gamestate parsed.');
-      console.log('Gamestate: ' + gameState);
+      console.log('Gamestate: ' + JSON.stringify(gameState));
 
 
       switch (commandInputSplit[0]) {
@@ -70,14 +70,14 @@ bot.on('message', message => {
 
         case '1':
         console.log('Player ' + message.author.username + ' has selected Tic-Tac-Toe...');
-        var Player1 = message.author;
-        var gameState = {'Player1': Player1, 'Game': commandInputSplit[1], 'awaitingPlayerCount': true};
+        var Player1 = message.author.id;
+        var gameState = {'Player1': Player1, 'gameID': commandInputSplit[1], 'awaitingPlayerCount': true};
         message.reply('1 or 2 players?');
         fs.writeFileSync('Game State.json', JSON.stringify(gameState), 'utf8');
         console.log('Game state stored.');
         break;
 
-        
+
         /*  switch (m.content) {
         case '1':
         console.log('Single-player mode selected');
