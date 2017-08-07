@@ -34,7 +34,7 @@ bot.on('message', message => {
       console.log('Gamestate parsed.');
       console.log('Gamestate: ' + JSON.stringify(gameState));
 
-
+      if (gameState.awaitingPlayerCount )
       switch (commandInputSplit[0]) {
         case 'ls':
         case 'list':
@@ -71,7 +71,7 @@ bot.on('message', message => {
         case '1':
         console.log('Player ' + message.author.username + ' has selected Tic-Tac-Toe...');
         var Player1 = message.author.id;
-        var gameState = {'Player1': Player1, 'gameID': commandInputSplit[1], 'awaitingPlayerCount': true};
+        var gameState = {'Player1': Player1, 'gameID': commandInputSplit[1], 'awaitingPlayerCount': true, 'inGame' : false};
         message.reply('1 or 2 players?');
         fs.writeFileSync('Game State.json', JSON.stringify(gameState), 'utf8');
         console.log('Game state stored.');
@@ -170,5 +170,16 @@ function randInt(min, max) {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
+
+function gameStateAppend(name, value) {
+  let gameState = JSON.parse(fs.readFileSync('Game State.json', 'utf8'));  // Read it
+  console.log('Gamestate parsed.');
+  console.log('Gamestate: ' + JSON.stringify(gameState));
+
+  gameState.push({name: value});  // Append the value
+  
+  fs.writeFileSync('Game State.json', JSON.stringify(gameState), 'utf8');  // Write it back
+  console.log('Game state stored.');
+}
 
 bot.login(token);
