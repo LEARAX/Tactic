@@ -51,7 +51,7 @@ bot.on('message', message => {
 
 								{
 									name: '```[0]: Frozen Syncord```',
-									value: 'Welcome to Markov Geist'
+									value: 'Welcome to Markov Geist!'
 								},
 
 								{
