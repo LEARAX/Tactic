@@ -12,7 +12,7 @@ bot.on('disconnect', event => {
 
 bot.on('ready', () => {
 	console.log('╦═╗┌─┐┌─┐┌┬┐┬ ┬┬\n╠╦╝├┤ ├─┤ ││└┬┘│\n╩╚═└─┘┴ ┴─┴┘ ┴ o');
-	var gameState = { 'Player1': null, 'Player2': null, 'gameID': null, 'awaitingPlayerCount': false, 'inGame' : false };
+	var gameState = { 'Player1': null, 'Player2': null, 'gameID': null, 'awaitingPlayerCount': false, 'inGame': false, 'playerCount': null };
 	gameStateStore(gameState);
 });
 
@@ -129,16 +129,42 @@ bot.on('message', message => {
 						});
 				};
 				message.delete();
-			} else if (awaitingPlayerCount) {
+			} else if (gameState.awaitingPlayerCount) {
 				if (message.author.id == gameState.Player1) {
 
-					switch (message.content) {
+					switch (commandInput) {
 						case '1':
 							console.log('Single-player mode selected');
+							gameStateAppend('awaitingPlayerCount', false);
+							gameStateAppend('playerCount', 1);
+							gameStateAppend('inGame', true);
 							break;
 
 						case '2':
 							console.log('2 player mode selected');
+							gameStateAppend('awaitingPlayerCount', false);
+							gameStateAppend('playerCount', 2);
+							gameStateAppend('inGame', true);
+
+							var TicTacBoard = []
+							for (i = 0; i != 9; i ++) TicTacBoard.push(0);	// Generate the board
+							gameStateAppend('TicTacBoard', TicTacBoard);
+							message.channel.send({embed: {
+								color: 0xffff00,
+								author: {
+									name: bot.user.username
+								},
+								title: 'Tic-Tac-Toe',
+								url: 'https://github.com/The-Complex/Tactic',
+								fields: [{
+									name: '',
+									value: 'Unrecognized value "' + commandInput + '". Please enter "1" or "2".'
+								},
+									{
+										name: 'Player 1 turn.'
+									}],
+							}
+							});
 							break;
 
 						default:
@@ -152,7 +178,7 @@ bot.on('message', message => {
 								url: 'https://github.com/The-Complex/Tactic',
 								fields: [{
 									name: 'INVALID NUMBER OF PLAYER',
-									value: 'Unrecognized value "' + m.content + '". Please enter "1" or "2".'
+									value: 'Unrecognized value "' + commandInput + '". Please enter "1" or "2".'
 								}],
 							}
 							});
@@ -188,7 +214,7 @@ function gameStateAppend(name, value) {
 
 	gameStateStore(gameState);  // Write it back
 
-	console.log('Value ' + value + ' for item ' + name + 'stored.');
+	console.log('Value ' + value + ' for item ' + name + ' stored.');
 }
 
 bot.login(token);
