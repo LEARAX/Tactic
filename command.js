@@ -77,38 +77,6 @@ bot.on('message', message => {
 								message.reply('1 or 2 players?');
 								break;
 
-
-								/*  switch (m.content) {
-	  case '1':
-	  console.log('Single-player mode selected');
-	  break;
-
-	  case '2':
-	  console.log('2 player mode selected');
-	  break;
-
-	  default:
-	  message.channel.send({embed: {
-	  color: 0xff0000,
-	  author: {
-	  name: bot.user.username,
-	  icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-	},
-	title: 'Error Handler',
-	url: 'https://github.com/The-Complex/Tactic',
-	fields: [{
-	name: 'INVALID NUMBER OF PLAYER',
-	value: 'Unrecognized value "' + m.content + '". Please enter "1" or "2".'
-      }],
-    }
-  });
-}
-var gameState = {
-'Player1': Player1,
-'Mode': }
-);*/
-
-
 							default:
 								message.channel.send({embed: {
 									color: 0xff0000,
@@ -161,6 +129,35 @@ var gameState = {
 						});
 				};
 				message.delete();
+			} else if (awaitingPlayerCount) {
+				if (message.author.id == gameState.Player1) {
+
+					switch (message.content) {
+						case '1':
+							console.log('Single-player mode selected');
+							break;
+
+						case '2':
+							console.log('2 player mode selected');
+							break;
+
+						default:
+							message.channel.send({embed: {
+								color: 0xff0000,
+								author: {
+									name: bot.user.username,
+									icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+								},
+								title: 'Error Handler',
+								url: 'https://github.com/The-Complex/Tactic',
+								fields: [{
+									name: 'INVALID NUMBER OF PLAYER',
+									value: 'Unrecognized value "' + m.content + '". Please enter "1" or "2".'
+								}],
+							}
+							});
+					}
+				}
 			};
 		};
 	};
