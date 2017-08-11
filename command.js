@@ -34,9 +34,15 @@ bot.on('message', message => {
 				gameStateAppend('Player2', message.author.id);
 				gameStateAppend('inGame', true);
 
-				var gameBoard = []
+				let playerTurn = randInt(1,2)
+				gameStateAppend('playerTurn', randInt(1,2));
+				console.log('Player ' + playerTurn + ' goes first.');
+
+				let gameBoard = [];
 				for (i = 0; i < 9; i++) gameBoard.push(9);
 				gameStateAppend('gameBoard', gameBoard);
+				console.log('Empty game-board generated.');
+				sendTicTacToeBoard(message, gameState.gameBoard);
 			};
 		};
 
@@ -50,7 +56,11 @@ bot.on('message', message => {
 			console.log('Parsing initial game state...');
 			var gameState = gameStateParse();
 
-			if (!gameState.awaitingPlayerCount) {
+			if (gameState.inGame && gameState.gameID == 1) {
+				console.log('We\'re ingame.');
+				sendTicTacToeBoard(message, gameState.gameBoard);
+
+			} else if (!gameState.awaitingPlayerCount) {
 				switch (commandInputSplit[0]) {
 					case 'ls':
 					case 'list':
@@ -191,6 +201,26 @@ function randInt(min, max) {
 	max = Math.floor(max);
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 };
+
+function sendTicTacToeBoard(message, gameBoard) {
+	message.channel.send({'embed': {
+		'title': 'Tic-Tac-Toe',
+		'color': 0xffff00,
+		'footer': {
+			'text': 'Player 2\'s turn'
+		},
+		author: {
+			'name': bot.user.username,
+			'icon_url': bot.user.avatarURL
+		},
+		'fields': [
+			{
+				'value': '```  x | x | x\n  --|---|--\n  x | x | x\n  --|---|--\n  x | x | x```'
+			}
+		]
+	}
+	})
+}
 
 function gameStateParse() {
 	let gameState = JSON.parse(fs.readFileSync('Game State.json', 'utf8'));
