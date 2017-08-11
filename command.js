@@ -12,7 +12,7 @@ bot.on('disconnect', event => {
 
 bot.on('ready', () => {
 	console.log('╦═╗┌─┐┌─┐┌┬┐┬ ┬┬\n╠╦╝├┤ ├─┤ ││└┬┘│\n╩╚═└─┘┴ ┴─┴┘ ┴ o');
-	var gameState = { 'Player1': null, 'Player2': null, 'gameID': null, 'awaitingPlayerCount': false, 'inGame': false, 'playerCount': null };
+	let gameState = { 'awaitingPlayerCount': false, 'awaitingPlayer2': false, 'inGame': false };
 	gameStateStore(gameState);
 });
 
@@ -24,9 +24,24 @@ bot.on('message', message => {
 		console.log('Message: ' + message.content);
 		console.log('Length: ' + message.content.length);
 
+		if (message.content == 'READY') {
+			var gameState = gameStateParse();
+			if (gameState.awaitingPlayer2) {
+				console.log('Player 2: ' + message.author.username);
+				message.reply('Player 2 identified as ' + message.author.username);
+
+				gameStateAppend('awaitingPlayer2', false);
+				gameStateAppend('Player2', message.author.id);
+				gameStateAppend('inGame', true);
+
+				var gameBoard = []
+				for (i = 0; i < 9; i++) gameBoard.push(9);
+				gameStateAppend('gameBoard', gameBoard);
+			};
+		};
 
 		if (message.content.slice(0,2) == '*$') {
-
+			message.delete();
 			console.log('Command detected.');
 			const commandInput = message.content.slice(2);
 			const commandInputSplit = commandInput.split(' ');
@@ -72,6 +87,7 @@ bot.on('message', message => {
 							case '1':
 								console.log('Player ' + message.author.username + ' has selected Tic-Tac-Toe...');
 
+								gameStateAppend('gameID', 1);
 								gameStateAppend('Player1', message.author.id);
 								gameStateAppend('awaitingPlayerCount', true);
 								message.reply('1 or 2 players?');
@@ -128,7 +144,6 @@ bot.on('message', message => {
 						}
 						});
 				};
-				message.delete();
 			} else if (gameState.awaitingPlayerCount) {
 				if (message.author.id == gameState.Player1) {
 
@@ -144,27 +159,9 @@ bot.on('message', message => {
 							console.log('2 player mode selected');
 							gameStateAppend('awaitingPlayerCount', false);
 							gameStateAppend('playerCount', 2);
-							gameStateAppend('inGame', true);
+							gameStateAppend('awaitingPlayer2', true);
 
-							var TicTacBoard = []
-							for (i = 0; i != 9; i ++) TicTacBoard.push(0);	// Generate the board
-							gameStateAppend('TicTacBoard', TicTacBoard);
-							message.channel.send({embed: {
-								color: 0xffff00,
-								author: {
-									name: bot.user.username
-								},
-								title: 'Tic-Tac-Toe',
-								url: 'https://github.com/The-Complex/Tactic',
-								fields: [{
-									name: '',
-									value: 'Unrecognized value "' + commandInput + '". Please enter "1" or "2".'
-								},
-									{
-										name: 'Player 1 turn.'
-									}],
-							}
-							});
+							message.channel.send('Player 2, please say "READY".');
 							break;
 
 						default:
@@ -182,8 +179,8 @@ bot.on('message', message => {
 								}],
 							}
 							});
-					}
-				}
+					};
+				};
 			};
 		};
 	};
