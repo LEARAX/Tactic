@@ -26,15 +26,17 @@ bot.on('message', message => {
 
 		if (message.content == 'READY') {
 			var gameState = gameStateParse();
+
 			if (gameState.awaitingPlayer2) {
 				console.log('Player 2: ' + message.author.username);
+				message.delete();
 				message.reply('Player 2 identified as ' + message.author.username);
 
 				gameStateAppend('awaitingPlayer2', false);
 				gameStateAppend('Player2', message.author.id);
 				gameStateAppend('inGame', true);
 
-				let playerTurn = randInt(1,2)
+				let playerTurn = randInt(1,2);
 				gameStateAppend('playerTurn', randInt(1,2));
 				console.log('Player ' + playerTurn + ' goes first.');
 
@@ -48,6 +50,7 @@ bot.on('message', message => {
 
 		if (message.content.slice(0,2) == '*$') {
 			message.delete();
+
 			console.log('Command detected.');
 			const commandInput = message.content.slice(2);
 			const commandInputSplit = commandInput.split(' ');
@@ -209,12 +212,13 @@ function sendTicTacToeBoard(message, gameBoard) {
 		'footer': {
 			'text': 'Player 2\'s turn'
 		},
-		author: {
+		'author': {
 			'name': bot.user.username,
 			'icon_url': bot.user.avatarURL
 		},
 		'fields': [
 			{
+				'name': 'Turn 1',
 				'value': '```  x | x | x\n  --|---|--\n  x | x | x\n  --|---|--\n  x | x | x```'
 			}
 		]
