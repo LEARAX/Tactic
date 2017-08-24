@@ -11,9 +11,8 @@ bot.on('disconnect', event => {
 });
 
 bot.on('ready', () => {
-		console.log('╦═╗┌─┐┌─┐┌┬┐┬ ┬┬\n╠╦╝├┤ ├─┤ ││└┬┘│\n╩╚═└─┘┴ ┴─┴┘ ┴ o');
-		let gameState = { 'awaitingPlayerCount': false, 'awaitingPlayer2': false, 'inGame': false };
-		gameStateStore(gameState);
+				console.log('╦═╗┌─┐┌─┐┌┬┐┬ ┬┬\n╠╦╝├┤ ├─┤ ││└┬┘│\n╩╚═└─┘┴ ┴─┴┘ ┴ o');
+				gameStateStore({ 'awaitingPlayerCount': false, 'awaitingPlayer2': false, 'inGame': false });
 });
 
 bot.on('message', message => {
