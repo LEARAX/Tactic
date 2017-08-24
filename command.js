@@ -36,8 +36,9 @@ bot.on('message', message => {
         gameStateAppend('inGame', true);
 
         gameStateAppend('turn', 1);
-        gaemStateAppend('lastMove', 0)
+        gameStateAppend('lastMove', 0);
 
+        randInt(1,2);
         let playerTurn = randInt(1,2);
         gameStateAppend('playerTurn', playerTurn);
         console.log('Player ' + playerTurn + ' goes first.');
@@ -46,7 +47,7 @@ bot.on('message', message => {
         for (i = 0; i < 9; i++) gameBoard.push(0);
         gameStateAppend('gameBoard', gameBoard);
         console.log('Empty game board generated.');
-        sendTicTacToeBoard(message, gameState);
+        sendTicTacToeBoard(message, gameStateParse());
       };
     };
 
@@ -65,153 +66,160 @@ bot.on('message', message => {
         console.log('We\'re ingame.');
         switch (gameState.playerTurn) {
           case 1:
-            if (message.author.id == gameState.Player1) {
-
+          if (message.author.id == gameState.Player1) {
+            try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
+            if (gameState.gameBoard[playerMove] == 0) {
+              gameState.gameBoard[playerMove] = 1;
               sendTicTacToeBoard(message, gameState);
-            }
-            break;
+              gameStateAppend('gameBoard', gameState.gameBoard);
+              gameStateAppend('turn', gameState.turn + 1);
+              gameStateAppend('playerTurn', 2);
+              gameStateAppend('lastMove', playerMove);
+            };
+          }
+          break;
           case 2:
-            if (message.author.id == gameState.Player2) {
+          if (message.author.id == gameState.Player2) {
 
-              sendTicTacToeBoard(message, gameState);
-            }
-            break;
+            sendTicTacToeBoard(message, gameState);
+          }
+          break;
         };
 
       } else if (!gameState.awaitingPlayerCount) {
         switch (commandInputSplit[0]) {
           case 'ls':
           case 'list':
-            message.channel.send({embed: {
-              color: 0x0000ff,
-              author: {
-                name: bot.user.username,
-                icon_url: bot.user.avatarURL
+          message.channel.send({embed: {
+            color: 0x0000ff,
+            author: {
+              name: bot.user.username,
+              icon_url: bot.user.avatarURL
+            },
+            title: 'File System Wizard',
+            url: 'https://github.com/The-Complex/Tactic',
+            fields: [
+
+              {
+                name: '```[0]: Frozen Syncord```',
+                value: 'Welcome to Markov Geist!'
               },
-              title: 'File System Wizard',
-              url: 'https://github.com/The-Complex/Tactic',
-              fields: [
 
-                {
-                  name: '```[0]: Frozen Syncord```',
-                  value: 'Welcome to Markov Geist!'
-                },
+              {
+                name: '```[1]: Tic-Tac-Toe```',
+                value: 'X\'s & O\'s'
+              }
+            ],
+          }
+        });
+        break;
 
-                {
-                  name: '```[1]: Tic-Tac-Toe```',
-                  value: 'X\'s & O\'s'
-                }
-              ],
-            }
-            });
-            break;
+        case 'run':
+        switch (commandInputSplit[1]) {
+          case '0':
+          // TODO
+          break;
 
-          case 'run':
-            switch (commandInputSplit[1]) {
-              case '0':
-                // TODO
-                break;
+          case '1':
+          console.log('Player ' + message.author.username + ' has selected Tic-Tac-Toe...');
 
-              case '1':
-                console.log('Player ' + message.author.username + ' has selected Tic-Tac-Toe...');
-
-                gameStateAppend('gameID', 1);
-                gameStateAppend('Player1', message.author.id);
-                gameStateAppend('awaitingPlayerCount', true);
-                message.reply('1 or 2 players?');
-                break;
-
-              default:
-                message.channel.send({embed: {
-                  color: 0xff0000,
-                  author: {
-                    name: bot.user.username,
-                    icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-                  },
-                  title: 'Error Handler',
-                  url: 'https://github.com/The-Complex/Tactic',
-                  fields: [{
-                    name: 'UNRECOGNIZED PROGRAM',
-                    value: 'Program ID "' + commandInputSplit[1] + '" was unrecognized.'
-                  }],
-                }
-                });
-            };
-            break;
-
-          case '':
-            message.channel.send({embed: {
-              color: 0xff0000,
-              author: {
-                name: bot.user.username,
-                icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-              },
-              title: 'Error Handler',
-              url: 'https://github.com/The-Complex/Tactic',
-              fields: [{
-                name: 'COMMAND INVALID',
-                value: 'Please enter a command!'
-              }],
-            }
-            });
-            break;
+          gameStateAppend('gameID', 1);
+          gameStateAppend('Player1', message.author.id);
+          gameStateAppend('awaitingPlayerCount', true);
+          message.reply('1 or 2 players?');
+          break;
 
           default:
-            message.channel.send({embed: {
-              color: 0xff0000,
-              author: {
-                name: bot.user.username,
-                icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-              },
-              title: 'Error Handler',
-              url: 'https://github.com/The-Complex/Tactic',
-              fields: [{
-                name: 'COMMAND INVALID',
-                value: 'Your command "' + commandInputSplit[0] + '" was unrecognized.'
-              }],
-            }
-            });
-        };
-      } else if (gameState.awaitingPlayerCount) {
-        if (message.author.id == gameState.Player1) {
-
-          switch (commandInput) {
-            case '1':
-              console.log('Single-player mode selected');
-              gameStateAppend('awaitingPlayerCount', false);
-              gameStateAppend('playerCount', 1);
-              gameStateAppend('inGame', true);
-              break;
-
-            case '2':
-              console.log('2 player mode selected');
-              gameStateAppend('awaitingPlayerCount', false);
-              gameStateAppend('playerCount', 2);
-              gameStateAppend('awaitingPlayer2', true);
-
-              message.channel.send('Player 2, please say "READY".');
-              break;
-
-            default:
-              message.channel.send({embed: {
-                color: 0xff0000,
-                author: {
-                  name: bot.user.username,
-                  icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-                },
-                title: 'Error Handler',
-                url: 'https://github.com/The-Complex/Tactic',
-                fields: [{
-                  name: 'INVALID NUMBER OF PLAYER',
-                  value: 'Unrecognized value "' + commandInput + '". Please enter "1" or "2".'
-                }],
-              }
-              });
-          };
-        };
+          message.channel.send({embed: {
+            color: 0xff0000,
+            author: {
+              name: bot.user.username,
+              icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+            },
+            title: 'Error Handler',
+            url: 'https://github.com/The-Complex/Tactic',
+            fields: [{
+              name: 'UNRECOGNIZED PROGRAM',
+              value: 'Program ID "' + commandInputSplit[1] + '" was unrecognized.'
+            }],
+          }
+        });
       };
-    };
+      break;
+
+      case '':
+      message.channel.send({embed: {
+        color: 0xff0000,
+        author: {
+          name: bot.user.username,
+          icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+        },
+        title: 'Error Handler',
+        url: 'https://github.com/The-Complex/Tactic',
+        fields: [{
+          name: 'COMMAND INVALID',
+          value: 'Please enter a command!'
+        }],
+      }
+    });
+    break;
+
+    default:
+    message.channel.send({embed: {
+      color: 0xff0000,
+      author: {
+        name: bot.user.username,
+        icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+      },
+      title: 'Error Handler',
+      url: 'https://github.com/The-Complex/Tactic',
+      fields: [{
+        name: 'COMMAND INVALID',
+        value: 'Your command "' + commandInputSplit[0] + '" was unrecognized.'
+      }],
+    }
+  });
+};
+} else if (gameState.awaitingPlayerCount) {
+  if (message.author.id == gameState.Player1) {
+
+    switch (commandInput) {
+      case '1':
+      console.log('Single-player mode selected');
+      gameStateAppend('awaitingPlayerCount', false);
+      gameStateAppend('playerCount', 1);
+      gameStateAppend('inGame', true);
+      break;
+
+      case '2':
+      console.log('2 player mode selected');
+      gameStateAppend('awaitingPlayerCount', false);
+      gameStateAppend('playerCount', 2);
+      gameStateAppend('awaitingPlayer2', true);
+
+      message.channel.send('Player 2, please say "READY".');
+      break;
+
+      default:
+      message.channel.send({embed: {
+        color: 0xff0000,
+        author: {
+          name: bot.user.username,
+          icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+        },
+        title: 'Error Handler',
+        url: 'https://github.com/The-Complex/Tactic',
+        fields: [{
+          name: 'INVALID NUMBER OF PLAYER',
+          value: 'Unrecognized value "' + commandInput + '". Please enter "1" or "2".'
+        }],
+      }
+    });
   };
+};
+};
+};
+};
 });
 
 function randInt(min, max) {
@@ -225,7 +233,7 @@ function sendTicTacToeBoard(message, gameState) {
     'title': 'Tic-Tac-Toe',
     'color': 0xffff00,
     'footer': {
-      'text': 'Player 2\'s turn'
+      'text': 'Player ' + gameState.playerTurn + '\'s turn'
     },
     'author': {
       'name': bot.user.username,
@@ -238,13 +246,13 @@ function sendTicTacToeBoard(message, gameState) {
         'inline': true
       },
       {
-        'name': 'Turn 1',
+        'name': 'Turn ' + gameState.turn,
         'value': '```  x | x | x\n  --|---|--\n  x | x | x\n  --|---|--\n  x | x | x```',
         'inline': true
       }
     ]
   }
-  })
+})
 }
 
 function gameStateParse() {
