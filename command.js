@@ -35,15 +35,18 @@ bot.on('message', message => {
         gameStateAppend('Player2', message.author.id);
         gameStateAppend('inGame', true);
 
+        gameStateAppend('turn', 1);
+        gaemStateAppend('lastMove', 0)
+
         let playerTurn = randInt(1,2);
-        gameStateAppend('playerTurn', randInt(1,2));
+        gameStateAppend('playerTurn', playerTurn);
         console.log('Player ' + playerTurn + ' goes first.');
 
         let gameBoard = [];
-        for (i = 0; i < 9; i++) gameBoard.push(9);
+        for (i = 0; i < 9; i++) gameBoard.push(0);
         gameStateAppend('gameBoard', gameBoard);
-        console.log('Empty game-board generated.');
-        sendTicTacToeBoard(message, gameState.gameBoard);
+        console.log('Empty game board generated.');
+        sendTicTacToeBoard(message, gameState);
       };
     };
 
@@ -60,7 +63,20 @@ bot.on('message', message => {
 
       if (gameState.inGame && gameState.gameID == 1) {
         console.log('We\'re ingame.');
-        sendTicTacToeBoard(message, gameState.gameBoard);
+        switch (gameState.playerTurn) {
+          case 1:
+            if (message.author.id == gameState.Player1) {
+
+              sendTicTacToeBoard(message, gameState);
+            }
+            break;
+          case 2:
+            if (message.author.id == gameState.Player2) {
+
+              sendTicTacToeBoard(message, gameState);
+            }
+            break;
+        };
 
       } else if (!gameState.awaitingPlayerCount) {
         switch (commandInputSplit[0]) {
@@ -204,7 +220,7 @@ function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-function sendTicTacToeBoard(message, gameBoard) {
+function sendTicTacToeBoard(message, gameState) {
   message.channel.send({'embed': {
     'title': 'Tic-Tac-Toe',
     'color': 0xffff00,
@@ -217,12 +233,14 @@ function sendTicTacToeBoard(message, gameBoard) {
     },
     'fields': [
       {
-        'name': '*' +  + '*',
-        'value': '+-------------------+'
+        'name': 'Last move: ' + gameState.lastMove,
+        'value': '```  x | - | -\n  --|---|--\n  - | - | -\n  --|---|--\n  - | - | -```',
+        'inline': true
       },
       {
         'name': 'Turn 1',
-        'value': '```  x | x | x\n  --|---|--\n  x | x | x\n  --|---|--\n  x | x | x```'
+        'value': '```  x | x | x\n  --|---|--\n  x | x | x\n  --|---|--\n  x | x | x```',
+        'inline': true
       }
     ]
   }
