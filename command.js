@@ -4,7 +4,7 @@ const fs = require('fs');
 
 const config = require('config.json')('./secrets.json');
 const token = config.token;
-
+const { exec } = require('child_process');
 
 bot.on('disconnect', event => {
   console.log('!Disconnected: ' + event.reason + ' (' + event.code + ')!');
@@ -216,6 +216,10 @@ function sendTicTacToeBoard(message, gameBoard) {
       'icon_url': bot.user.avatarURL
     },
     'fields': [
+      {
+        'name': '*' +  + '*',
+        'value': '+-------------------+'
+      },
       {
         'name': 'Turn 1',
         'value': '```  x | x | x\n  --|---|--\n  x | x | x\n  --|---|--\n  x | x | x```'
