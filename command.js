@@ -49,6 +49,15 @@ bot.on('message', message => {
             for (i = 0; i < 9; i++) gameBoard.push('-');
             gameState.gameBoard = gameBoard;
             console.log('Empty game board generated.');
+
+            if (playerTurn == 2) {	// AI goes first
+              let playerMove = 4;
+              gameState.gameBoard[playerMove] = 'o';
+              gameState.turn ++;
+              gameState.playerTurn = 1;
+              gameState.lastMove = playerMove;
+            }
+
             sendTicTacToeBoard(message.channel, gameState);
             gameStateStore(gameState);
 
@@ -162,33 +171,33 @@ bot.on('message', message => {
           };
         } else if (gameState.playerCount == 1) {
           console.log('We\'re ingame, with 1 player. Begin parsing move.');
-            if (gameState.playerTurn == 1) {
-              if (message.author.id == gameState.Player1.id) {
-                try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
-                if (gameState.gameBoard[playerMove] == '-') {
-                  gameState.gameBoard[playerMove] = 'x';
-                  gameState.turn ++;
-                  gameState.playerTurn = 2;
-                  gameState.lastMove = playerMove;
-                  sendTicTacToeBoard(message.channel, gameState);
-                  gameStateStore(gameState);
+          if (gameState.playerTurn == 1) {
+            if (message.author.id == gameState.Player1.id) {
+              try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
+              if (gameState.gameBoard[playerMove] == '-') {
+                gameState.gameBoard[playerMove] = 'x';
+                gameState.turn ++;
+                gameState.playerTurn = 2;
+                gameState.lastMove = playerMove;
+                sendTicTacToeBoard(message.channel, gameState);
+                gameStateStore(gameState);
 
-                  // Begin AI response
-                  playerMove = botMove(gameState.gameBoard);
+                // Begin AI response
+                playerMove = botMove(gameState.gameBoard);
 
-                  while (gameState.gameBoard[playerMove] != '-') {	// Only allow the AI to make valid moves
-                    playerMove = botMove(gameState.gameBoard);		// Submit the move for Player2
-                  };
-
-                  gameState.gameBoard[playerMove] = 'o';
-                  gameState.turn ++;
-                  gameState.playerTurn = 1;
-                  gameState.lastMove = playerMove;
-                  sendTicTacToeBoard(message.channel, gameState);
-                  gameStateStore(gameState);
+                while (gameState.gameBoard[playerMove] != '-') {	// Only allow the AI to make valid moves
+                  playerMove = botMove(gameState.gameBoard);		// Submit the move for Player2
                 };
+
+                gameState.gameBoard[playerMove] = 'o';
+                gameState.turn ++;
+                gameState.playerTurn = 1;
+                gameState.lastMove = playerMove;
+                sendTicTacToeBoard(message.channel, gameState);
+                gameStateStore(gameState);
               };
             };
+          };
         };
       } else if (!gameState.awaitingPlayerCount) {
         switch (commandInputSplit[0]) {
@@ -331,7 +340,7 @@ function sendTicTacToeBoard(channel, gameState) {
   });
   if (checkWin(gameState.lastMove, gameState.gameBoard)) {
     channel.send('You win!' + gameState.gameBoard[gameState.lastMove]);
-  } else if (gameState.gameBoard.indexOf('-' == -1)) {
+  } else if (gameState.gameBoard.indexOf('-') == -1) {
     channel.send('It\'s a draw!');
   }
 }
