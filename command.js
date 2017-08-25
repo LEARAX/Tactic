@@ -22,6 +22,47 @@ bot.on('message', message => {
     console.log('Message: ' + message.content);
     console.log('Length: ' + message.content.length);
 
+    if (message.content == 1 || message.content == 2) {
+      var gameState = gameStateParse()
+      if (gameState.awaitingPlayerCount) {
+        if (message.author.id == gameState.Player1) {
+
+          switch (message.content) {
+            case '1':
+              console.log('Single-player mode selected');
+              gameStateAppend('awaitingPlayerCount', false);
+              gameStateAppend('playerCount', 1);
+              gameStateAppend('inGame', true);
+              break;
+
+            case '2':
+              console.log('2 player mode selected');
+              gameStateAppend('awaitingPlayerCount', false);
+              gameStateAppend('playerCount', 2);
+              gameStateAppend('awaitingPlayer2', true);
+
+              message.channel.send('Player 2, please say "READY".');
+              break;
+
+            default:
+              message.channel.send({embed: {
+                color: 0xff0000,
+                author: {
+                  name: bot.user.username,
+                  icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+                },
+                title: 'Error Handler',
+                url: 'https://github.com/The-Complex/Tactic',
+                fields: [{
+                  name: 'INVALID NUMBER OF PLAYER',
+                  value: 'Unrecognized value "' + commandInput + '". Please enter "1" or "2".'
+                }],
+              }
+              });
+          };
+        };
+      };
+    };
     if (message.content == 'READY') {
       var gameState = gameStateParse();
 
@@ -185,43 +226,6 @@ bot.on('message', message => {
               }],
             }
             });
-        };
-      } else if (gameState.awaitingPlayerCount) {
-        if (message.author.id == gameState.Player1) {
-
-          switch (commandInput) {
-            case '1':
-              console.log('Single-player mode selected');
-              gameStateAppend('awaitingPlayerCount', false);
-              gameStateAppend('playerCount', 1);
-              gameStateAppend('inGame', true);
-              break;
-
-            case '2':
-              console.log('2 player mode selected');
-              gameStateAppend('awaitingPlayerCount', false);
-              gameStateAppend('playerCount', 2);
-              gameStateAppend('awaitingPlayer2', true);
-
-              message.channel.send('Player 2, please say "READY".');
-              break;
-
-            default:
-              message.channel.send({embed: {
-                color: 0xff0000,
-                author: {
-                  name: bot.user.username,
-                  icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-                },
-                title: 'Error Handler',
-                url: 'https://github.com/The-Complex/Tactic',
-                fields: [{
-                  name: 'INVALID NUMBER OF PLAYER',
-                  value: 'Unrecognized value "' + commandInput + '". Please enter "1" or "2".'
-                }],
-              }
-              });
-          };
         };
       };
     };
