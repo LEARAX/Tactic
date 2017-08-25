@@ -247,7 +247,7 @@ function randInt(min, max) {
 };
 
 function sendTicTacToeBoard(channel, gameState) {
-  if (gameState.toBeDeleted != undefined) {
+  if (gameState.lastMove != null) {
     messagePurge(gameState.toBeDeleted);
     console.log('Cleaned old board.');
   };
