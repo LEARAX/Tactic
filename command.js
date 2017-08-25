@@ -24,44 +24,45 @@ bot.on('message', message => {
 
     if (message.content == 1 || message.content == 2) {
       var gameState = gameStateParse()
-      if (gameState.awaitingPlayerCount) {
-        if (message.author.id == gameState.Player1) {
+      if (gameState.awaitingPlayerCount || message.author.id == gameState.Player1.id) {
+        message.delete();
+        switch (message.content) {
 
-          switch (message.content) {
-            case '1':
-              console.log('Single-player mode selected');
-              gameStateAppend('awaitingPlayerCount', false);
-              gameStateAppend('playerCount', 1);
-              gameStateAppend('inGame', true);
-              break;
+          case '1':
+            console.log('Single-player mode selected');
+            messagePurge(gameState.toBeDeleted);
+            gameStateAppend('awaitingPlayerCount', false);
+            gameStateAppend('playerCount', 1);
+            gameStateAppend('inGame', true);
+            break;
 
-            case '2':
-              console.log('2 player mode selected');
-              gameStateAppend('awaitingPlayerCount', false);
-              gameStateAppend('playerCount', 2);
-              gameStateAppend('awaitingPlayer2', true);
+          case '2':
+            console.log('2 player mode selected');
+            messagePurge(gameState.toBeDeleted);
+            gameStateAppend('awaitingPlayerCount', false);
+            gameStateAppend('playerCount', 2);
+            gameStateAppend('awaitingPlayer2', true);
 
-              message.channel.send('Player 2, please say "READY".').then( msg => {
-                markForPurge(msg);
-              });
-              break;
+            message.channel.send('Player 2, please say "READY".').then( msg => {
+              markForPurge(msg);
+            });
+            break;
 
-            default:
-              message.channel.send({embed: {
-                color: 0xff0000,
-                author: {
-                  name: bot.user.username,
-                  icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-                },
-                title: 'Error Handler',
-                url: 'https://github.com/The-Complex/Tactic',
-                fields: [{
-                  name: 'INVALID NUMBER OF PLAYER',
-                  value: 'Unrecognized value "' + commandInput + '". Please enter "1" or "2".'
-                }],
-              }
-              });
-          };
+          default:
+            message.channel.send({embed: {
+              color: 0xff0000,
+              author: {
+                name: bot.user.username,
+                icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+              },
+              title: 'Error Handler',
+              url: 'https://github.com/The-Complex/Tactic',
+              fields: [{
+                name: 'INVALID NUMBER OF PLAYER',
+                value: 'Unrecognized value "' + commandInput + '". Please enter "1" or "2".'
+              }],
+            }
+            });
         };
       };
     };
@@ -73,13 +74,12 @@ bot.on('message', message => {
         message.delete();
         messagePurge(gameState.toBeDeleted);
         let channelMembers = message.channel.members;
-        console.log('Member: ' + channelMembers.get(gameState.Player1).id);
-        message.channel.send('Player 1 identified as ' + channelMembers.get(gameState.Player1).username);
-        message.channel.send('Player 2 identified as ' + message.author.username);
+        message.channel.send('Player 1 identified as ' + channelMembers.get(gameState.Player1.id).toString());
+        message.channel.send('Player 2 identified as ' + message.author.toString());
 
 
         gameStateAppend('awaitingPlayer2', false);
-        gameStateAppend('Player2', message.author.id);
+        gameStateAppend('Player2', { 'id': message.author.id, 'name': message.author.username });
         gameStateAppend('inGame', true);
 
         gameStateAppend('turn', 1);
@@ -113,7 +113,7 @@ bot.on('message', message => {
         console.log('We\'re ingame.');
         switch (gameState.playerTurn) {
           case 1:
-            if (message.author.id == gameState.Player1) {
+            if (message.author.id == gameState.Player1.id) {
               try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
               if (gameState.gameBoard[playerMove] == '-') {
                 gameState.gameBoard[playerMove] = 'x';
@@ -127,7 +127,7 @@ bot.on('message', message => {
             break;
 
           case 2:
-            if (message.author.id == gameState.Player2) {
+            if (message.author.id == gameState.Player2.id) {
               try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
               if (gameState.gameBoard[playerMove] == '-') {
                 gameState.gameBoard[playerMove] = 'o';
@@ -179,9 +179,11 @@ bot.on('message', message => {
                 console.log('Player ' + message.author.username + ' has selected Tic-Tac-Toe...');
 
                 gameStateAppend('gameID', 1);
-                gameStateAppend('Player1', message.author.id);
+                gameStateAppend('Player1', { 'id': message.author.id, 'name': message.author.username });
                 gameStateAppend('awaitingPlayerCount', true);
-                message.reply('1 or 2 players?');
+                message.reply('1 or 2 players?').then( msg => {
+                  markForPurge(msg);
+                });
                 break;
 
               default:
@@ -256,7 +258,7 @@ function sendTicTacToeBoard(channel, gameState) {
     'title': 'Tic-Tac-Toe',
     'color': 0xffff00,
     'footer': {
-      'text': 'Player ' + gameState.playerTurn + '\'s turn'
+      'text': footerDetermineText(gameState.playerTurn, gameState.Player1.name, gameState.Player2.name)
     },
     'author': {
       'name': bot.user.username,
@@ -295,11 +297,21 @@ function messagePurge(marked) {
   messageToBeDeleted.delete();
 }
 
+function footerDetermineText(playerTurn, Player1, Player2) {
+  switch (playerTurn) {
+    case 1:
+      return Player1 + '\'s turn';
+      break;
+    case 2:
+      return Player2 + '\'s turn';
+      break;
+  }
+}
 function lastMoveDetermineName(lastMove, sign) {
   if (lastMove === null) {
     return 'No prior moves';	// Set at game start
   } else {
-    return 'Last move: ' + (lastMove + 1) + ' [ ' + sign + ' ]';	// Once lastMove is declared
+    return 'Tile ' + (lastMove + 1) + ' captured by ' + sign.toUpperCase() + '.';	// Once lastMove is declared
   };
 }
 
@@ -311,13 +323,13 @@ function lastMoveDetermineValue(lastMove, sign) {
 }
 
 function visualBoardGen(boardMachine) {
-  var boardVisual = '```';	// Declare the board with a prefix
+  var boardVisual = '```      2';	// Declare the board with a prefix
   for (i = 0; i < 3; i++) {
-    boardVisual += '  ' + boardMachine[3 * i] + ' | ' + boardMachine[3 * i + 1] + ' | ' + boardMachine[3 * i + 2];	// Generate a row
-    if (i < 2) boardVisual += '\n  --|---|--\n';	// Add 2 dividers
+    boardVisual += '\n' + (3 * i + 1) + ' ' + boardMachine[3 * i] + ' | ' + boardMachine[3 * i + 1] + ' | ' + boardMachine[3 * i + 2] + ' ' + (3 * i + 3) + '\n';	// Generate a row
+    if (i < 2) boardVisual += '  --|---|--';	// Add 2 dividers
   };
 
-  return boardVisual + '```';	// Return the board, with the suffix
+  return boardVisual + '      8```';	// Return the board, with the suffix
 }
 
 function gameStateParse() {
