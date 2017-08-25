@@ -331,7 +331,7 @@ function sendTicTacToeBoard(channel, gameState) {
   });
   if (checkWin(gameState.lastMove, gameState.gameBoard)) {
     channel.send('You win!' + gameState.gameBoard[gameState.lastMove]);
-  } else if (gameState.gameBoard.indexOf('-' == -1) {
+  } else if (gameState.gameBoard.indexOf('-' == -1)) {
     channel.send('It\'s a draw!');
   }
 }
