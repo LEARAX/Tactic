@@ -110,9 +110,9 @@ bot.on('message', message => {
               try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
               if (gameState.gameBoard[playerMove] == '-') {
                 gameState.gameBoard[playerMove] = 'x';
-                gameState.turn ++
-                gameState.playerTurn = 2
-                gameState.lastMove = playerMove
+                gameState.turn ++;
+                gameState.playerTurn = 2;
+                gameState.lastMove = playerMove;
                 sendTicTacToeBoard(message.channel, gameState);
                 gameStateStore(gameState);
               };
@@ -123,7 +123,7 @@ bot.on('message', message => {
               try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
               if (gameState.gameBoard[playerMove] == '-') {
                 gameState.gameBoard[playerMove] = 'o';
-                gameState.turn++;
+                gameState.turn ++;
                 gameState.playerTurn = 1;
                 gameState.lastMove = playerMove;
                 sendTicTacToeBoard(message.channel, gameState);
