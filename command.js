@@ -36,7 +36,7 @@ bot.on('message', message => {
         gameStateAppend('inGame', true);
 
         gameStateAppend('turn', 1);
-        gameStateAppend('lastMove', 0);
+        gameStateAppend('lastMove', null);
 
         randInt(1,2);
         let playerTurn = randInt(1,2);
@@ -71,9 +71,9 @@ bot.on('message', message => {
               if (gameState.gameBoard[playerMove] == '-') {
                 gameState.gameBoard[playerMove] = 'x';
                 gameState.turn ++
-		gameState.playerTurn = 2
-		gameState.lastMove = playerMove
-		sendTicTacToeBoard(message.channel, gameState);
+                gameState.playerTurn = 2
+                gameState.lastMove = playerMove
+                sendTicTacToeBoard(message.channel, gameState);
                 gameStateStore(gameState);
               };
             }
@@ -241,7 +241,7 @@ function sendTicTacToeBoard(channel, gameState) {
     },
     'fields': [
       {
-        'name': 'Last move: ' + gameState.lastMove,
+        'name': lastMoveDetermineName(gameState.lastMove, gameState.gameBoard[gameState.lastMove]),
         'value': '```  x | - | -\n  --|---|--\n  - | - | -\n  --|---|--\n  - | - | -```',
         'inline': true
       },
@@ -253,6 +253,18 @@ function sendTicTacToeBoard(channel, gameState) {
     ]
   }
   });
+}
+
+function lastMoveDetermineName(lastMove, sign) {
+  if (lastMove === null) {
+    return 'No prior moves';	// Set at game start
+  } else {
+    return 'Last move: ' + (lastMove + 1) + ' [ ' + sign + ' ]';	// Once lastMove is declared
+  };
+}
+
+function lastMoveDetermineValue(lastMove, sign) {
+
 }
 
 function gameStateParse() {
