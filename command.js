@@ -78,23 +78,24 @@ bot.on('message', message => {
         message.channel.send('Player 2 identified as ' + message.author.toString());
 
 
-        gameStateAppend('awaitingPlayer2', false);
-        gameStateAppend('Player2', { 'id': message.author.id, 'name': message.author.username });
-        gameStateAppend('inGame', true);
+        gameState.awaitingPlayer2 = false;
+        gameState.Player2 = { 'id': message.author.id, 'name': message.author.username };
+        gameState.inGame = true;
 
-        gameStateAppend('turn', 1);
-        gameStateAppend('lastMove', null);
+        gameState.turn = 1;
+        gameState.lastMove = null;
 
         randInt(1,2);
         let playerTurn = randInt(1,2);
-        gameStateAppend('playerTurn', playerTurn);
+        gameState.playerTurn = playerTurn;
         console.log('Player ' + playerTurn + ' goes first.');
 
         let gameBoard = [];
         for (i = 0; i < 9; i++) gameBoard.push('-');
-        gameStateAppend('gameBoard', gameBoard);
+        gameState.gameBoard = gameBoard;
         console.log('Empty game board generated.');
-        sendTicTacToeBoard(message.channel, gameStateParse());
+        sendTicTacToeBoard(message.channel, gameState);
+        gameStateStore(gameState);
       };
     };
 
@@ -109,8 +110,8 @@ bot.on('message', message => {
       console.log('Parsing initial game state...');
       var gameState = gameStateParse();
 
-      if (gameState.inGame && gameState.gameID == 1) {
-        console.log('We\'re ingame.');
+      if (gameState.inGame && gameState.gameID == 1 && playerCount == 2) {
+        console.log('We\'re ingame, with 2 players. Begin parsing move.');
         switch (gameState.playerTurn) {
           case 1:
             if (message.author.id == gameState.Player1.id) {
