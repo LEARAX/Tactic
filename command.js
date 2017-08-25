@@ -44,10 +44,10 @@ bot.on('message', message => {
         console.log('Player ' + playerTurn + ' goes first.');
 
         let gameBoard = [];
-        for (i = 0; i < 9; i++) gameBoard.push(0);
+        for (i = 0; i < 9; i++) gameBoard.push('-');
         gameStateAppend('gameBoard', gameBoard);
         console.log('Empty game board generated.');
-        sendTicTacToeBoard(message, gameStateParse());
+        sendTicTacToeBoard(message.channel, gameStateParse());
       };
     };
 
@@ -68,20 +68,20 @@ bot.on('message', message => {
           case 1:
             if (message.author.id == gameState.Player1) {
               try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
-              if (gameState.gameBoard[playerMove] == 0) {
-                gameState.gameBoard[playerMove] = 1;
-                sendTicTacToeBoard(message, gameState);
-                gameStateAppend('gameBoard', gameState.gameBoard);
-                gameStateAppend('turn', gameState.turn + 1);
-                gameStateAppend('playerTurn', 2);
-                gameStateAppend('lastMove', playerMove);
+              if (gameState.gameBoard[playerMove] == '-') {
+                gameState.gameBoard[playerMove] = 'x';
+                gameState.turn ++
+		gameState.playerTurn = 2
+		gameState.lastMove = playerMove
+		sendTicTacToeBoard(message.channel, gameState);
+                gameStateStore(gameState);
               };
             }
             break;
           case 2:
             if (message.author.id == gameState.Player2) {
 
-              sendTicTacToeBoard(message, gameState);
+              sendTicTacToeBoard(message.channel, gameState);
             }
             break;
         };
@@ -228,8 +228,8 @@ function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-function sendTicTacToeBoard(message, gameState) {
-  message.channel.send({'embed': {
+function sendTicTacToeBoard(channel, gameState) {
+  channel.send({'embed': {
     'title': 'Tic-Tac-Toe',
     'color': 0xffff00,
     'footer': {
@@ -247,12 +247,12 @@ function sendTicTacToeBoard(message, gameState) {
       },
       {
         'name': 'Turn ' + gameState.turn,
-        'value': '```  x | x | x\n  --|---|--\n  x | x | x\n  --|---|--\n  x | x | x```',
+        'value': '```  ' + gameState.gameBoard[0] + ' | ' + gameState.gameBoard[1] + ' | ' + gameState.gameBoard[2] + '\n  --|---|--\n  ' + gameState.gameBoard[3] + ' | ' + gameState.gameBoard[4] + ' | ' + gameState.gameBoard[5] + '\n  --|---|--\n  ' + gameState.gameBoard[6] + ' | ' + gameState.gameBoard[7] + ' | ' + gameState.gameBoard[8] + '```',
         'inline': true
       }
     ]
   }
-  })
+  });
 }
 
 function gameStateParse() {
