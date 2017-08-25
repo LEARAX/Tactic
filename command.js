@@ -16,7 +16,7 @@ bot.on('ready', () => {
 
 bot.on('message', message => {
   if (!message.author.bot) {
-    console.log('Message detected.');
+    console.log('\n\nMessage detected.');
     console.log('Time: ' + Date());
     console.log('From: ' + message.author.username);
     console.log('Message: ' + message.content);
@@ -41,7 +41,9 @@ bot.on('message', message => {
               gameStateAppend('playerCount', 2);
               gameStateAppend('awaitingPlayer2', true);
 
-              message.channel.send('Player 2, please say "READY".');
+              message.channel.send('Player 2, please say "READY".').then( msg => {
+                markForPurge(msg);
+              });
               break;
 
             default:
@@ -69,7 +71,12 @@ bot.on('message', message => {
       if (gameState.awaitingPlayer2) {
         console.log('Player 2: ' + message.author.username);
         message.delete();
-        message.reply('Player 2 identified as ' + message.author.username);
+        messagePurge(gameState.toBeDeleted);
+        let channelMembers = message.channel.members;
+        console.log('Member: ' + channelMembers.get(gameState.Player1).id);
+        message.channel.send('Player 1 identified as ' + channelMembers.get(gameState.Player1).username);
+        message.channel.send('Player 2 identified as ' + message.author.username);
+
 
         gameStateAppend('awaitingPlayer2', false);
         gameStateAppend('Player2', message.author.id);
@@ -116,8 +123,9 @@ bot.on('message', message => {
                 sendTicTacToeBoard(message.channel, gameState);
                 gameStateStore(gameState);
               };
-            }
+            };
             break;
+
           case 2:
             if (message.author.id == gameState.Player2) {
               try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
@@ -129,7 +137,7 @@ bot.on('message', message => {
                 sendTicTacToeBoard(message.channel, gameState);
                 gameStateStore(gameState);
               };
-            }
+            };
             break;
         };
 
@@ -239,6 +247,11 @@ function randInt(min, max) {
 };
 
 function sendTicTacToeBoard(channel, gameState) {
+  if (gameState.toBeDeleted != undefined) {
+    messagePurge(gameState.toBeDeleted);
+    console.log('Cleaned old board.');
+  };
+
   channel.send({'embed': {
     'title': 'Tic-Tac-Toe',
     'color': 0xffff00,
@@ -262,7 +275,23 @@ function sendTicTacToeBoard(channel, gameState) {
       }
     ]
   }
+  }).then( msg => {
+    markForPurge(msg);
   });
+}
+
+function markForPurge(msg) {
+  gameStateAppend('toBeDeleted', { 'id': msg.id, 'channel': msg.channel.id, 'guild': msg.guild.id });
+}
+
+function messagePurge(marked) {
+    let messageToBeDeletedGuild = bot.guilds.get(marked.guild);
+    console.log('Marked message guild: ' + messageToBeDeletedGuild.name);
+    let messageToBeDeletedChannel = messageToBeDeletedGuild.channels.get(marked.channel);
+    console.log('Marked message channel: ' + messageToBeDeletedChannel.name);
+    let messageToBeDeleted = messageToBeDeletedChannel.messages.get(marked.id);
+    console.log('Isolated message to be removed.');
+    messageToBeDeleted.delete();
 }
 
 function lastMoveDetermineName(lastMove, sign) {
