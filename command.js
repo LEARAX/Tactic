@@ -285,13 +285,14 @@ function markForPurge(msg) {
 }
 
 function messagePurge(marked) {
-    let messageToBeDeletedGuild = bot.guilds.get(marked.guild);
-    console.log('Marked message guild: ' + messageToBeDeletedGuild.name);
-    let messageToBeDeletedChannel = messageToBeDeletedGuild.channels.get(marked.channel);
-    console.log('Marked message channel: ' + messageToBeDeletedChannel.name);
-    let messageToBeDeleted = messageToBeDeletedChannel.messages.get(marked.id);
-    console.log('Isolated message to be removed.');
-    messageToBeDeleted.delete();
+  let messageToBeDeletedGuild = bot.guilds.get(marked.guild);
+  console.log('Marked message guild: ' + messageToBeDeletedGuild.name);
+  let messageToBeDeletedChannel = messageToBeDeletedGuild.channels.get(marked.channel);
+  console.log('Marked message channel: ' + messageToBeDeletedChannel.name);
+  let messageToBeDeleted = messageToBeDeletedChannel.messages.get(marked.id);
+  console.log('Isolated message to be removed.');
+  console.log('Message to be deleted: ' + messageToBeDeleted.content);
+  messageToBeDeleted.delete();
 }
 
 function lastMoveDetermineName(lastMove, sign) {
