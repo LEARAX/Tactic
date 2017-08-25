@@ -79,8 +79,15 @@ bot.on('message', message => {
             break;
           case 2:
             if (message.author.id == gameState.Player2) {
-
-              sendTicTacToeBoard(message.channel, gameState);
+              try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
+              if (gameState.gameBoard[playerMove] == '-') {
+                gameState.gameBoard[playerMove] = 'o';
+                gameState.turn++;
+                gameState.playerTurn = 1;
+                gameState.lastMove = playerMove;
+                sendTicTacToeBoard(message.channel, gameState);
+                gameStateStore(gameState);
+              };
             }
             break;
         };
