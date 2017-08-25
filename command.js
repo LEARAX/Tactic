@@ -4,7 +4,6 @@ const fs = require('fs');
 
 const config = require('config.json')('./secrets.json');
 const token = config.token;
-const { exec } = require('child_process');
 
 bot.on('disconnect', event => {
   console.log('!Disconnected: ' + event.reason + ' (' + event.code + ')!');
@@ -247,7 +246,7 @@ function sendTicTacToeBoard(channel, gameState) {
       },
       {
         'name': 'Turn ' + gameState.turn,
-        'value': '```  ' + gameState.gameBoard[0] + ' | ' + gameState.gameBoard[1] + ' | ' + gameState.gameBoard[2] + '\n  --|---|--\n  ' + gameState.gameBoard[3] + ' | ' + gameState.gameBoard[4] + ' | ' + gameState.gameBoard[5] + '\n  --|---|--\n  ' + gameState.gameBoard[6] + ' | ' + gameState.gameBoard[7] + ' | ' + gameState.gameBoard[8] + '```',
+        'value': visualBoardGen(gameState.gameBoard),
         'inline': true
       }
     ]
@@ -264,20 +263,20 @@ function lastMoveDetermineName(lastMove, sign) {
 }
 
 function lastMoveDetermineValue(lastMove, sign) {
-  if (lastMove == null) {
-    return '```  - | - | -\n  --|---|--\n  - | - | -\n  --|---|--\n  - | - | -```';
-  } else {
-    let lastBoard = [];
-    for (i = 0; i < 9; i++) lastBoard.push('-');
-    lastBoard[lastMove] = sign;
-    var boardVis = '```';
-    for (i = 0; i < 3; i++) {
-      boardVis += '  ' + lastBoard[3 * i] + ' | ' + lastBoard[3 * i + 1] + ' | ' + lastBoard[3 * i + 2];
-      if (i < 2) boardVis += '\n  --|---|--\n';
-    };
-    boardVis += '```';
-    return boardVis
-  }
+  let lastBoard = [];
+  for (i = 0; i < 9; i++) lastBoard.push('-');
+  if (lastMove != null) lastBoard[lastMove] = sign;
+  return visualBoardGen(lastBoard);
+}
+
+function visualBoardGen(boardMachine) {
+  var boardVisual = '```';	// Declare the board with a prefix
+  for (i = 0; i < 3; i++) {
+    boardVisual += '  ' + boardMachine[3 * i] + ' | ' + boardMachine[3 * i + 1] + ' | ' + boardMachine[3 * i + 2];	// Generate a row
+    if (i < 2) boardVisual += '\n  --|---|--\n';	// Add 2 dividers
+  };
+
+  return boardVisual + '```';	// Return the board, with the suffix
 }
 
 function gameStateParse() {
