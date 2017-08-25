@@ -31,9 +31,27 @@ bot.on('message', message => {
           case '1':
             console.log('Single-player mode selected');
             messagePurge(gameState.toBeDeleted);
-            gameStateAppend('awaitingPlayerCount', false);
-            gameStateAppend('playerCount', 1);
-            gameStateAppend('inGame', true);
+            gameState.awaitingPlayerCount = false;
+            gameState.playerCount = 1;
+            gameState.inGame = true;
+
+            gameState.Player2 = { 'id': null, 'name': 'Dominik' };
+
+            gameState.turn = 1;
+            gameState.lastMove = null
+
+            randInt(1, 2);
+            let playerTurn = randInt(1, 2);
+            gameState.playerTurn = playerTurn;
+            console.log('Player ' + playerTurn + ' goes first.');
+
+            let gameBoard = [];
+            for (i = 0; i < 9; i++) gameBoard.push('-');
+            gameState.gameBoard = gameBoard;
+            console.log('Empty game board generated.');
+            sendTicTacToeBoard(message.channel, gameState);
+            gameStateStore(gameState);
+
             break;
 
           case '2':
@@ -85,8 +103,8 @@ bot.on('message', message => {
         gameState.turn = 1;
         gameState.lastMove = null;
 
-        randInt(1,2);
-        let playerTurn = randInt(1,2);
+        randInt(1, 2);
+        let playerTurn = randInt(1, 2);
         gameState.playerTurn = playerTurn;
         console.log('Player ' + playerTurn + ' goes first.');
 
@@ -99,7 +117,7 @@ bot.on('message', message => {
       };
     };
 
-    if (message.content.slice(0,2) == '*$') {
+    if (message.content.slice(0, 2) == '*$') {
       message.delete();
 
       console.log('Command detected.');
@@ -110,38 +128,68 @@ bot.on('message', message => {
       console.log('Parsing initial game state...');
       var gameState = gameStateParse();
 
-      if (gameState.inGame && gameState.gameID == 1 && playerCount == 2) {
-        console.log('We\'re ingame, with 2 players. Begin parsing move.');
-        switch (gameState.playerTurn) {
-          case 1:
-            if (message.author.id == gameState.Player1.id) {
-              try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
-              if (gameState.gameBoard[playerMove] == '-') {
-                gameState.gameBoard[playerMove] = 'x';
-                gameState.turn ++;
-                gameState.playerTurn = 2;
-                gameState.lastMove = playerMove;
-                sendTicTacToeBoard(message.channel, gameState);
-                gameStateStore(gameState);
+      if (gameState.inGame && gameState.gameID == 1) {
+        if (gameState.playerCount == 2) {
+          console.log('We\'re ingame, with 2 players. Begin parsing move.');
+          switch (gameState.playerTurn) {
+            case 1:
+              if (message.author.id == gameState.Player1.id) {
+                try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
+                if (gameState.gameBoard[playerMove] == '-') {
+                  gameState.gameBoard[playerMove] = 'x';
+                  gameState.turn ++;
+                  gameState.playerTurn = 2;
+                  gameState.lastMove = playerMove;
+                  sendTicTacToeBoard(message.channel, gameState);
+                  gameStateStore(gameState);
+                };
               };
-            };
-            break;
+              break;
 
-          case 2:
-            if (message.author.id == gameState.Player2.id) {
-              try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
-              if (gameState.gameBoard[playerMove] == '-') {
-                gameState.gameBoard[playerMove] = 'o';
-                gameState.turn ++;
-                gameState.playerTurn = 1;
-                gameState.lastMove = playerMove;
-                sendTicTacToeBoard(message.channel, gameState);
-                gameStateStore(gameState);
+            case 2:
+              if (message.author.id == gameState.Player2.id) {
+                try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
+                if (gameState.gameBoard[playerMove] == '-') {
+                  gameState.gameBoard[playerMove] = 'o';
+                  gameState.turn ++;
+                  gameState.playerTurn = 1;
+                  gameState.lastMove = playerMove;
+                  sendTicTacToeBoard(message.channel, gameState);
+                  gameStateStore(gameState);
+                };
+              };
+              break;
+          };
+        } else if (gameState.playerCount == 1) {
+          console.log('We\'re ingame, with 1 player. Begin parsing move.');
+            if (gameState.playerTurn == 1) {
+              if (message.author.id == gameState.Player1.id) {
+                try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
+                if (gameState.gameBoard[playerMove] == '-') {
+                  gameState.gameBoard[playerMove] = 'x';
+                  gameState.turn ++;
+                  gameState.playerTurn = 2;
+                  gameState.lastMove = playerMove;
+                  sendTicTacToeBoard(message.channel, gameState);
+                  gameStateStore(gameState);
+
+                  // Begin AI response
+                  playerMove = botMove(gameState.gameBoard);
+
+                  while (gameState.gameBoard[playerMove] != '-') {	// Only allow the AI to make valid moves
+                    playerMove = botMove(gameState.gameBoard);		// Submit the move for Player2
+                  };
+
+                  gameState.gameBoard[playerMove] = 'o';
+                  gameState.turn ++;
+                  gameState.playerTurn = 1;
+                  gameState.lastMove = playerMove;
+                  sendTicTacToeBoard(message.channel, gameState);
+                  gameStateStore(gameState);
+                };
               };
             };
-            break;
         };
-
       } else if (!gameState.awaitingPlayerCount) {
         switch (commandInputSplit[0]) {
           case 'ls':
@@ -281,6 +329,82 @@ function sendTicTacToeBoard(channel, gameState) {
   }).then( msg => {
     markForPurge(msg);
   });
+  if (checkWin(gameState.lastMove, gameState.gameBoard)) {
+    channel.send('You win!' + gameState.gameBoard[gameState.lastMove]);
+  } else if (gameState.gameBoard.indexOf('-' == -1) {
+    channel.send('It\'s a draw!');
+  }
+}
+
+function checkWin(lastMove, gameBoard) {
+  /*
+   *let matrixGameBoard = [
+   *  [ gameBoard[0], gameBoard[1], gameBoard[2] ],
+   *  [ gameBoard[3], gameBoard[4], gameBoard[5] ],
+   *  [ gameBoard[6], gameBoard[7], gameBoard[8] ]
+   *]
+   */
+  var solution = '';
+
+  for (i = 0; i < 2; i++) {
+    solution += gameBoard[lastMove]
+  };
+  console.log('Solution for comparison: ' + solution)
+  // Start cracking
+
+  switch (lastMove) {
+    case 0:
+      if (gameBoard[0] + gameBoard[1] + gameBoard[2] == solution) return true
+      if (gameBoard[0] + gameBoard[3] + gameBoard[6] == solution) return true
+      if (gameBoard[0] + gameBoard[4] + gameBoard[8] == solution) return true
+      break;
+
+    case 1:
+      if (gameBoard[1] + gameBoard[0] + gameBoard[2] == solution) return true
+      if (gameBoard[1] + gameBoard[4] + gameBoard[7] == solution) return true
+      break;
+
+    case 2:
+      if (gameBoard[2] + gameBoard[0] + gameBoard[1] == solution) return true
+      if (gameBoard[2] + gameBoard[4] + gameBoard[6] == solution) return true
+      if (gameBoard[2] + gameBoard[5] + gameBoard[8] == solution) return true
+      break;
+
+    case 3:
+      if (gameBoard[3] + gameBoard[0] + gameBoard[6] == solution) return true
+      if (gameBoard[3] + gameBoard[4] + gameBoard[5] == solution) return true
+      break;
+
+    case 4:
+      if (gameBoard[4] + gameBoard[0] + gameBoard[8] == solution) return true
+      if (gameBoard[4] + gameBoard[1] + gameBoard[7] == solution) return true
+      if (gameBoard[4] + gameBoard[2] + gameBoard[6] == solution) return true
+      if (gameBoard[4] + gameBoard[3] + gameBoard[5] == solution) return true
+      break;
+
+    case 5:
+      if (gameBoard[5] + gameBoard[2] + gameBoard[8] == solution) return true
+      if (gameBoard[5] + gameBoard[3] + gameBoard[4] == solution) return true
+      break;
+
+    case 6:
+      if (gameBoard[6] + gameBoard[0] + gameBoard[3] == solution) return true
+      if (gameBoard[6] + gameBoard[2] + gameBoard[4] == solution) return true
+      if (gameBoard[6] + gameBoard[7] + gameBoard[8] == solution) return true
+      break;
+
+    case 7:
+      if (gameBoard[7] + gameBoard[1] + gameBoard[4] == solution) return true
+      if (gameBoard[7] + gameBoard[6] + gameBoard[8] == solution) return true
+      break;
+
+    case 8:
+      if (gameBoard[8] + gameBoard[0] + gameBoard[4] == solution) return true
+      if (gameBoard[8] + gameBoard[2] + gameBoard[5] == solution) return true
+      if (gameBoard[8] + gameBoard[6] + gameBoard[7] == solution) return true
+      break;
+  }
+  return false;
 }
 
 function markForPurge(msg) {
@@ -331,6 +455,10 @@ function visualBoardGen(boardMachine) {
   };
 
   return boardVisual + '      8```';	// Return the board, with the suffix
+}
+
+function  botMove(gameBoard) {
+  return randInt(1, 9);
 }
 
 function gameStateParse() {
