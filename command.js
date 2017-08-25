@@ -242,7 +242,7 @@ function sendTicTacToeBoard(channel, gameState) {
     'fields': [
       {
         'name': lastMoveDetermineName(gameState.lastMove, gameState.gameBoard[gameState.lastMove]),
-        'value': '```  x | - | -\n  --|---|--\n  - | - | -\n  --|---|--\n  - | - | -```',
+        'value': lastMoveDetermineValue(gameState.lastMove, gameState.gameBoard[gameState.lastMove]),
         'inline': true
       },
       {
@@ -264,7 +264,20 @@ function lastMoveDetermineName(lastMove, sign) {
 }
 
 function lastMoveDetermineValue(lastMove, sign) {
-
+  if (lastMove == null) {
+    return '```  - | - | -\n  --|---|--\n  - | - | -\n  --|---|--\n  - | - | -```';
+  } else {
+    let lastBoard = [];
+    for (i = 0; i < 9; i++) lastBoard.push('-');
+    lastBoard[lastMove] = sign;
+    var boardVis = '```';
+    for (i = 0; i < 3; i++) {
+      boardVis += '  ' + lastBoard[3 * i] + ' | ' + lastBoard[3 * i + 1] + ' | ' + lastBoard[3 * i + 2];
+      if (i < 2) boardVis += '\n  --|---|--\n';
+    };
+    boardVis += '```';
+    return boardVis
+  }
 }
 
 function gameStateParse() {
