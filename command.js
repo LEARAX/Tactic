@@ -165,7 +165,7 @@ bot.on('message', message => {
                   gameState.lastMove = playerMove;
                   gameStateStore(gameState);
                   sendTicTacToeBoard(message.channel, gameState);
-                };
+                } else message.channel.send('Invalid move: ' + (playerMove + 1));
               };
               break;
           };
@@ -174,6 +174,7 @@ bot.on('message', message => {
           if (gameState.playerTurn == 1) {
             if (message.author.id == gameState.Player1.id) {
               try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
+
               if (gameState.gameBoard[playerMove] == '-') {
                 gameState.gameBoard[playerMove] = 'x';
                 gameState.turn ++;
@@ -187,6 +188,7 @@ bot.on('message', message => {
                   sendTicTacToeBoard(message.channel, gameState);
                   var gameOver = true;
                 };
+
                 if (!gameOver) {
                   // Begin AI response
                   playerMove = botMove(gameState.gameBoard);
@@ -202,7 +204,7 @@ bot.on('message', message => {
                   gameStateStore(gameState);
                   sendTicTacToeBoard(message.channel, gameState);
                 };
-              };
+              } else message.channel.send('Invalid move: ' + (playerMove + 1));
             };
           };
         };
@@ -221,12 +223,7 @@ bot.on('message', message => {
               fields: [
 
                 {
-                  name: '```[0]: Frozen Syncord```',
-                  value: 'Welcome to Markov Geist!'
-                },
-
-                {
-                  name: '```[1]: Tic-Tac-Toe```',
+                  name: '```[0]: Tic-Tac-Toe```',
                   value: 'X\'s & O\'s'
                 }
               ],
@@ -236,11 +233,8 @@ bot.on('message', message => {
 
           case 'run':
             switch (commandInputSplit[1]) {
-              case '0':
-                // TODO
-                break;
 
-              case '1':
+              case '0':
                 console.log('Player ' + message.author.username + ' has selected Tic-Tac-Toe...');
 
                 gameStateAppend('gameID', 1);
