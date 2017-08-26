@@ -11,7 +11,7 @@ bot.on('disconnect', event => {
 
 bot.on('ready', () => {
   console.log('╦═╗┌─┐┌─┐┌┬┐┬ ┬┬\n╠╦╝├┤ ├─┤ ││└┬┘│\n╩╚═└─┘┴ ┴─┴┘ ┴ o');
-  gameStateStore({ 'awaitingPlayerCount': false, 'awaitingPlayer2': false, 'inGame': false });
+  gameStateStore({ });
 });
 
 bot.on('message', message => {
@@ -179,8 +179,12 @@ bot.on('message', message => {
                 gameState.turn ++;
                 gameState.playerTurn = 2;
                 gameState.lastMove = playerMove;
-                sendTicTacToeBoard(message.channel, gameState);
-                gameStateStore(gameState);
+
+                if (checkWin(gameState.lastMove, gameState.gameBoard)) {
+                  sendTicTacToeBoard(message.channel, gameState);
+                } else if (gameState.gameBoard.indexOf('-') == -1) {
+                  sendTicTacToeBoard(message.channel, gameState);
+                };
 
                 // Begin AI response
                 playerMove = botMove(gameState.gameBoard);
@@ -338,11 +342,27 @@ function sendTicTacToeBoard(channel, gameState) {
   }).then( msg => {
     markForPurge(msg);
   });
-  if (checkWin(gameState.lastMove, gameState.gameBoard)) {
-    channel.send('You win!' + gameState.gameBoard[gameState.lastMove]);
-  } else if (gameState.gameBoard.indexOf('-') == -1) {
-    channel.send('It\'s a draw!');
+
+  if (checkWin(gameState.lastMove, gameState.gameBoard) || gameState.gameBoard.indexOf('-') == -1) {
+    gameOverResponse(channel, gameState.gameBoard[gameState.lastMove], gameState.Player1.name, gameState.Player2.name);
+  };
+}
+
+function gameOverResponse(channel, victor, Player1, Player2) {
+  switch (victor) {
+    case 'x':
+      channel.send('Game over. ' + Player1 + ' won.');
+      break;
+
+    case 'o':
+      channel.send('Game over. ' + Player2 + ' won.');
+      break;
+
+    case '-':
+      channel.send('It\'s a draw!');
+      break;
   }
+  gameStateStore({ });
 }
 
 function checkWin(lastMove, gameBoard) {
@@ -355,7 +375,7 @@ function checkWin(lastMove, gameBoard) {
    */
   var solution = '';
 
-  for (i = 0; i < 2; i++) {
+  for (i = 0; i < 3; i++) {
     solution += gameBoard[lastMove]
   };
   console.log('Solution for comparison: ' + solution)
@@ -490,6 +510,15 @@ function gameStateAppend(name, value) {
   gameStateStore(gameState);  // Write it back
 
   console.log('Value ' + value + ' for item ' + name + ' stored.');
+}
+
+function delay(milliseconds) {
+  var start = new Date().getTime();
+  for (i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds) {
+      break;
+    };
+  };
 }
 
 bot.login(token);
