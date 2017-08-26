@@ -26,6 +26,7 @@ bot.on('message', message => {
       var gameState = gameStateParse()
       if (gameState.awaitingPlayerCount || message.author.id == gameState.Player1.id) {
         message.delete();
+
         switch (message.content) {
 
           case '1':
@@ -60,7 +61,6 @@ bot.on('message', message => {
 
             gameStateStore(gameState);
             sendTicTacToeBoard(message.channel, gameState);
-
             break;
 
           case '2':
@@ -93,13 +93,15 @@ bot.on('message', message => {
         };
       };
     };
-    if (message.content == 'READY') {
-      var gameState = gameStateParse();
 
-      if (gameState.awaitingPlayer2) {
+
+    if (message.content == 'READY') {
+      var gameState = gameStateParse();		// Need to check if that meant something
+
+      if (gameState.awaitingPlayer2) {		// If it did...
         console.log('Player 2: ' + message.author.username);
-        message.delete();
-        messagePurge(gameState.toBeDeleted);
+        message.delete();			// Delete it
+        messagePurge(gameState.toBeDeleted);	// Get rid of the prompt
         let channelMembers = message.channel.members;
         message.channel.send('Player 1 identified as ' + channelMembers.get(gameState.Player1.id).toString());
         message.channel.send('Player 2 identified as ' + message.author.toString());
@@ -126,6 +128,7 @@ bot.on('message', message => {
       };
     };
 
+
     if (message.content.slice(0, 2) == '*$') {
       message.delete();
 
@@ -151,7 +154,7 @@ bot.on('message', message => {
                   gameState.lastMove = playerMove;
                   gameStateStore(gameState);
                   sendTicTacToeBoard(message.channel, gameState);
-                };
+                } else message.channel.send('Invalid move: ' + (playerMove + 1));
               };
               break;
 
