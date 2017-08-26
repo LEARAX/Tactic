@@ -52,7 +52,7 @@ bot.on('message', message => {
             console.log('Empty game board generated.');
 
             if (playerTurn == 2) {	// AI goes first
-              let playerMove = 4;
+              let playerMove = botMove(gameState.gameBoard);
               gameState.gameBoard[playerMove] = 'o';
               gameState.turn ++;
               gameState.playerTurn = 1;
@@ -195,10 +195,6 @@ bot.on('message', message => {
                 if (!gameOver) {
                   // Begin AI response
                   playerMove = botMove(gameState.gameBoard);
-
-                  while (gameState.gameBoard[playerMove] != '-') {	// Only allow the AI to make valid moves
-                    playerMove = botMove(gameState.gameBoard);		// Submit the move for Player2
-                  };
 
                   gameState.gameBoard[playerMove] = 'o';
                   gameState.turn ++;
@@ -489,7 +485,11 @@ function visualBoardGen(boardMachine) {
 }
 
 function  botMove(gameBoard) {
-  return randInt(1, 9);
+  let move = randInt(1, 9);
+  while (gameBoard[move] != '-') {
+    move = randInt(1, 9);
+  }
+  return move
 }
 
 function gameStateParse() {
