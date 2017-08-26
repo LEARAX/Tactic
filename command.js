@@ -58,8 +58,8 @@ bot.on('message', message => {
               gameState.lastMove = playerMove;
             }
 
-            sendTicTacToeBoard(message.channel, gameState);
             gameStateStore(gameState);
+            sendTicTacToeBoard(message.channel, gameState);
 
             break;
 
@@ -149,8 +149,8 @@ bot.on('message', message => {
                   gameState.turn ++;
                   gameState.playerTurn = 2;
                   gameState.lastMove = playerMove;
-                  sendTicTacToeBoard(message.channel, gameState);
                   gameStateStore(gameState);
+                  sendTicTacToeBoard(message.channel, gameState);
                 };
               };
               break;
@@ -163,8 +163,8 @@ bot.on('message', message => {
                   gameState.turn ++;
                   gameState.playerTurn = 1;
                   gameState.lastMove = playerMove;
-                  sendTicTacToeBoard(message.channel, gameState);
                   gameStateStore(gameState);
+                  sendTicTacToeBoard(message.channel, gameState);
                 };
               };
               break;
@@ -182,23 +182,26 @@ bot.on('message', message => {
 
                 if (checkWin(gameState.lastMove, gameState.gameBoard)) {
                   sendTicTacToeBoard(message.channel, gameState);
+                  var gameOver = true;
                 } else if (gameState.gameBoard.indexOf('-') == -1) {
                   sendTicTacToeBoard(message.channel, gameState);
+                  var gameOver = true;
                 };
+                if (!gameOver) {
+                  // Begin AI response
+                  playerMove = botMove(gameState.gameBoard);
 
-                // Begin AI response
-                playerMove = botMove(gameState.gameBoard);
+                  while (gameState.gameBoard[playerMove] != '-') {	// Only allow the AI to make valid moves
+                    playerMove = botMove(gameState.gameBoard);		// Submit the move for Player2
+                  };
 
-                while (gameState.gameBoard[playerMove] != '-') {	// Only allow the AI to make valid moves
-                  playerMove = botMove(gameState.gameBoard);		// Submit the move for Player2
+                  gameState.gameBoard[playerMove] = 'o';
+                  gameState.turn ++;
+                  gameState.playerTurn = 1;
+                  gameState.lastMove = playerMove;
+                  gameStateStore(gameState);
+                  sendTicTacToeBoard(message.channel, gameState);
                 };
-
-                gameState.gameBoard[playerMove] = 'o';
-                gameState.turn ++;
-                gameState.playerTurn = 1;
-                gameState.lastMove = playerMove;
-                sendTicTacToeBoard(message.channel, gameState);
-                gameStateStore(gameState);
               };
             };
           };
@@ -343,9 +346,11 @@ function sendTicTacToeBoard(channel, gameState) {
     markForPurge(msg);
   });
 
-  if (checkWin(gameState.lastMove, gameState.gameBoard) || gameState.gameBoard.indexOf('-') == -1) {
+  if (checkWin(gameState.lastMove, gameState.gameBoard)) {
     gameOverResponse(channel, gameState.gameBoard[gameState.lastMove], gameState.Player1.name, gameState.Player2.name);
-  };
+  } else if (gameState.gameBoard.indexOf('-') == -1) { 
+    gameOverResponse(channel, '-', gameState.Player1.name, gameState.Player2.name);
+  }
 }
 
 function gameOverResponse(channel, victor, Player1, Player2) {
