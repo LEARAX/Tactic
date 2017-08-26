@@ -348,7 +348,7 @@ function sendTicTacToeBoard(channel, gameState) {
 
   if (checkWin(gameState.lastMove, gameState.gameBoard)) {
     gameOverResponse(channel, gameState.gameBoard[gameState.lastMove], gameState.Player1.name, gameState.Player2.name);
-  } else if (gameState.gameBoard.indexOf('-') == -1) { 
+  } else if (gameState.gameBoard.indexOf('-') == -1) {
     gameOverResponse(channel, '-', gameState.Player1.name, gameState.Player2.name);
   }
 }
