@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const bot = new Discord.Client();
 const fs = require('fs');
+const ticTacToeAiEngine = require('tic-tac-toe-ai-engine');
 
 const config = require('config.json')('./secrets.json');
 const token = config.token;
@@ -485,11 +486,18 @@ function visualBoardGen(boardMachine) {
 }
 
 function  botMove(gameBoard) {
-  let move = randInt(1, 9);
-  while (gameBoard[move] != '-') {
-    move = randInt(1, 9);
-  }
-  return move
+  var aiBoard = []
+  for (i = 0; i < gameBoard.length - 1; i++) {
+    if (gameBoard[i] == '-') {
+      aiBoard[i] = '';
+    } else {
+      aiBoard[i] = gameBoard[i].toUpperCase;
+    };
+  };
+
+  let aiThought = ticTacToeAiEngine.computeMove(aiBoard);
+  console.log('AI Idea: ' + aiThought);
+  return aiThought.depth - 1;
 }
 
 function gameStateParse() {
