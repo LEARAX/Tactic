@@ -5,8 +5,7 @@
   "main": "command.js",
   "dependencies": {
     "config.json": "^0.0.4",
-    "discord.js": "^11.0.0",
-    "tic-tac-toe-ai-engine": "^1.0.9"
+    "discord.js": "^11.0.0"
   },
   "repository": {
     "type": "git",
