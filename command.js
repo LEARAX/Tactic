@@ -308,69 +308,6 @@ function  botMove(gameBoard) {
   return move;
 }
 
-function gameOverResponse(channel, victor, Player1, Player2) {
-  switch (victor) {
-    case 'x':
-      channel.send('Game over. ' + Player1 + ' won.');
-      break;
-
-    case 'o':
-      channel.send('Game over. ' + Player2 + ' won.');
-      break;
-
-    case '-':
-      channel.send('It\'s a draw!');
-      break;
-  }
-  gameStateStore({ });
-}
-
-function randInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-};
-
-function sendTicTacToeBoard(channel, gameState) {
-  if (gameState.lastMove != null) {
-    messagePurge(gameState.toBeDeleted);
-    console.log('Cleaned old board.');
-  };
-
-  channel.send({'embed': {
-    'title': 'Tic-Tac-Toe',
-    'color': 0xffff00,
-    'footer': {
-      'text': footerDetermineText(gameState.playerTurn, gameState.Player1.name, gameState.Player2.name)
-    },
-    'author': {
-      'name': bot.user.username,
-      'icon_url': bot.user.avatarURL
-    },
-    'fields': [
-      {
-        'name': lastMoveDetermineName(gameState.lastMove, gameState.gameBoard[gameState.lastMove]),
-        'value': lastMoveDetermineValue(gameState.lastMove, gameState.gameBoard[gameState.lastMove]),
-        'inline': true
-      },
-      {
-        'name': 'Turn ' + gameState.turn,
-        'value': visualBoardGen(gameState.gameBoard),
-        'inline': true
-      }
-    ]
-  }
-  }).then( msg => {
-    markForPurge(msg);
-  });
-
-  if (checkWin(gameState.lastMove, gameState.gameBoard)) {
-    gameOverResponse(channel, gameState.gameBoard[gameState.lastMove], gameState.Player1.name, gameState.Player2.name);
-  } else if (gameState.gameBoard.indexOf('-') == -1) {
-    gameOverResponse(channel, '-', gameState.Player1.name, gameState.Player2.name);
-  }
-}
-
 function checkWin(lastMove, gameBoard) {
   /*
    *let matrixGameBoard = [
@@ -442,21 +379,6 @@ function checkWin(lastMove, gameBoard) {
   return false;
 }
 
-function markForPurge(msg) {
-  gameStateAppend('toBeDeleted', { 'id': msg.id, 'channel': msg.channel.id, 'guild': msg.guild.id });
-}
-
-function messagePurge(marked) {
-  let messageToBeDeletedGuild = bot.guilds.get(marked.guild);
-  console.log('Marked message guild: ' + messageToBeDeletedGuild.name);
-  let messageToBeDeletedChannel = messageToBeDeletedGuild.channels.get(marked.channel);
-  console.log('Marked message channel: ' + messageToBeDeletedChannel.name);
-  let messageToBeDeleted = messageToBeDeletedChannel.messages.get(marked.id);
-  console.log('Isolated message to be removed.');
-  console.log('Message to be deleted: ' + messageToBeDeleted.content);
-  messageToBeDeleted.delete();
-}
-
 function footerDetermineText(playerTurn, Player1, Player2) {
   switch (playerTurn) {
     case 1:
@@ -465,31 +387,24 @@ function footerDetermineText(playerTurn, Player1, Player2) {
     case 2:
       return Player2 + '\'s turn';
       break;
+  };
+}
+
+function gameOverResponse(channel, victor, Player1, Player2) {
+  switch (victor) {
+    case 'x':
+      channel.send('Game over. ' + Player1 + ' won.');
+      break;
+
+    case 'o':
+      channel.send('Game over. ' + Player2 + ' won.');
+      break;
+
+    case '-':
+      channel.send('It\'s a draw!');
+      break;
   }
-}
-function lastMoveDetermineName(lastMove, sign) {
-  if (lastMove === null) {
-    return 'No prior moves';	// Set at game start
-  } else {
-    return 'Tile ' + (lastMove + 1) + ' captured by ' + sign.toUpperCase() + '.';	// Once lastMove is declared
-  };
-}
-
-function lastMoveDetermineValue(lastMove, sign) {
-  let lastBoard = [];
-  for (i = 0; i < 9; i++) lastBoard.push('-');
-  if (lastMove != null) lastBoard[lastMove] = sign;
-  return visualBoardGen(lastBoard);
-}
-
-function visualBoardGen(boardMachine) {
-  var boardVisual = '```      2';	// Declare the board with a prefix
-  for (i = 0; i < 3; i++) {
-    boardVisual += '\n' + (3 * i + 1) + ' ' + boardMachine[3 * i] + ' | ' + boardMachine[3 * i + 1] + ' | ' + boardMachine[3 * i + 2] + ' ' + (3 * i + 3) + '\n';	// Generate a row
-    if (i < 2) boardVisual += '  --|---|--';	// Add 2 dividers
-  };
-
-  return boardVisual + '      8```';	// Return the board, with the suffix
+  gameStateStore({ });
 }
 
 function gameStateParse() {
@@ -521,6 +436,92 @@ function delay(milliseconds) {
       break;
     };
   };
+}
+
+function lastMoveDetermineName(lastMove, sign) {
+  if (lastMove === null) {
+    return 'No prior moves';	// Set at game start
+  } else {
+    return 'Tile ' + (lastMove + 1) + ' captured by ' + sign.toUpperCase() + '.';	// Once lastMove is declared
+  };
+}
+
+function lastMoveDetermineValue(lastMove, sign) {
+  let lastBoard = [];
+  for (i = 0; i < 9; i++) lastBoard.push('-');
+  if (lastMove != null) lastBoard[lastMove] = sign;
+  return visualBoardGen(lastBoard);
+}
+
+function markForPurge(msg) {
+  gameStateAppend('toBeDeleted', { 'id': msg.id, 'channel': msg.channel.id, 'guild': msg.guild.id });
+}
+
+function messagePurge(marked) {
+  let messageToBeDeletedGuild = bot.guilds.get(marked.guild);
+  console.log('Marked message guild: ' + messageToBeDeletedGuild.name);
+  let messageToBeDeletedChannel = messageToBeDeletedGuild.channels.get(marked.channel);
+  console.log('Marked message channel: ' + messageToBeDeletedChannel.name);
+  let messageToBeDeleted = messageToBeDeletedChannel.messages.get(marked.id);
+  console.log('Isolated message to be removed.');
+  console.log('Message to be deleted: ' + messageToBeDeleted.content);
+  messageToBeDeleted.delete();
+}
+
+function randInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+function sendTicTacToeBoard(channel, gameState) {
+  if (gameState.lastMove != null) {
+    messagePurge(gameState.toBeDeleted);
+    console.log('Cleaned old board.');
+  };
+
+  channel.send({'embed': {
+    'title': 'Tic-Tac-Toe',
+    'color': 0xffff00,
+    'footer': {
+      'text': footerDetermineText(gameState.playerTurn, gameState.Player1.name, gameState.Player2.name)
+    },
+    'author': {
+      'name': bot.user.username,
+      'icon_url': bot.user.avatarURL
+    },
+    'fields': [
+      {
+        'name': lastMoveDetermineName(gameState.lastMove, gameState.gameBoard[gameState.lastMove]),
+        'value': lastMoveDetermineValue(gameState.lastMove, gameState.gameBoard[gameState.lastMove]),
+        'inline': true
+      },
+      {
+        'name': 'Turn ' + gameState.turn,
+        'value': visualBoardGen(gameState.gameBoard),
+        'inline': true
+      }
+    ]
+  }
+  }).then( msg => {
+    markForPurge(msg);
+  });
+
+  if (checkWin(gameState.lastMove, gameState.gameBoard)) {
+    gameOverResponse(channel, gameState.gameBoard[gameState.lastMove], gameState.Player1.name, gameState.Player2.name);
+  } else if (gameState.gameBoard.indexOf('-') == -1) {
+    gameOverResponse(channel, '-', gameState.Player1.name, gameState.Player2.name);
+  }
+}
+
+function visualBoardGen(boardMachine) {
+  var boardVisual = '```      2';	// Declare the board with a prefix
+  for (i = 0; i < 3; i++) {
+    boardVisual += '\n' + (3 * i + 1) + ' ' + boardMachine[3 * i] + ' | ' + boardMachine[3 * i + 1] + ' | ' + boardMachine[3 * i + 2] + ' ' + (3 * i + 3) + '\n';	// Generate a row
+    if (i < 2) boardVisual += '  --|---|--';	// Add 2 dividers
+  };
+
+  return boardVisual + '      8```';	// Return the board, with the suffix
 }
 
 bot.login(token);
