@@ -1,7 +1,6 @@
 const Discord = require('discord.js');
 const bot = new Discord.Client();
 const fs = require('fs');
-const ticTacToeAiEngine = require('tic-tac-toe-ai-engine');
 
 const config = require('config.json')('./secrets.json');
 const token = config.token;
@@ -301,6 +300,31 @@ bot.on('message', message => {
   };
 });
 
+function  botMove(gameBoard) {
+  let move = randInt(1, 9);
+  while (gameBoard[move] != '-') {
+    move = randInt(1, 9);
+  };
+  return move;
+}
+
+function gameOverResponse(channel, victor, Player1, Player2) {
+  switch (victor) {
+    case 'x':
+      channel.send('Game over. ' + Player1 + ' won.');
+      break;
+
+    case 'o':
+      channel.send('Game over. ' + Player2 + ' won.');
+      break;
+
+    case '-':
+      channel.send('It\'s a draw!');
+      break;
+  }
+  gameStateStore({ });
+}
+
 function randInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -345,23 +369,6 @@ function sendTicTacToeBoard(channel, gameState) {
   } else if (gameState.gameBoard.indexOf('-') == -1) {
     gameOverResponse(channel, '-', gameState.Player1.name, gameState.Player2.name);
   }
-}
-
-function gameOverResponse(channel, victor, Player1, Player2) {
-  switch (victor) {
-    case 'x':
-      channel.send('Game over. ' + Player1 + ' won.');
-      break;
-
-    case 'o':
-      channel.send('Game over. ' + Player2 + ' won.');
-      break;
-
-    case '-':
-      channel.send('It\'s a draw!');
-      break;
-  }
-  gameStateStore({ });
 }
 
 function checkWin(lastMove, gameBoard) {
@@ -483,21 +490,6 @@ function visualBoardGen(boardMachine) {
   };
 
   return boardVisual + '      8```';	// Return the board, with the suffix
-}
-
-function  botMove(gameBoard) {
-  var aiBoard = []
-  for (i = 0; i < gameBoard.length - 1; i++) {
-    if (gameBoard[i] == '-') {
-      aiBoard[i] = '';
-    } else {
-      aiBoard[i] = gameBoard[i].toUpperCase;
-    };
-  };
-
-  let aiThought = ticTacToeAiEngine.computeMove(aiBoard);
-  console.log('AI Idea: ' + aiThought);
-  return aiThought.depth - 1;
 }
 
 function gameStateParse() {
