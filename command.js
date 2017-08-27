@@ -301,11 +301,29 @@ bot.on('message', message => {
 });
 
 function  botMove(gameBoard) {
-  let move = randInt(1, 9);
-  while (gameBoard[move] != '-') {
-    move = randInt(1, 9);
+  var availableMoves = []
+  for (i = 0; i < gameBoard.length; i++) {
+    if (gameBoard[i] == '-') {
+      availableMoves.push(i);
+    };
   };
-  return move;
+  console.log('Available moves for AI: ' + availableMoves);
+
+  var testBoard = [];
+
+  for (i = 0; i < availableMoves.length - 1; i++) {
+    testBoard = gameBoard;
+    testBoard[availableMoves[i]] = 'o';
+    console.log('Possible board configuration: ' + testBoard);
+    if (checkWin(availableMoves[i], testBoard)) {
+      console.log('Winning move found: ' + availableMoves[i]);
+      return availableMoves[i];
+    };
+  };
+
+
+    // Random AI fallback
+    return availableMoves[randInt(0, availableMoves.length - 1)];
 }
 
 function checkWin(lastMove, gameBoard) {
@@ -321,7 +339,9 @@ function checkWin(lastMove, gameBoard) {
   for (i = 0; i < 3; i++) {
     solution += gameBoard[lastMove]
   };
+
   console.log('Solution for comparison: ' + solution)
+
   // Start cracking
 
   switch (lastMove) {
