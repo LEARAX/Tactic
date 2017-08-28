@@ -311,7 +311,7 @@ function  botMove(gameBoard) {
 
   var testBoard = [];
 
-  for (a = 0; a < availableMoves.length - 1; a++) {
+  for (a = 0; a < availableMoves.length; a++) {
     testBoard = gameBoard.slice(0);
     testBoard[availableMoves[a]] = 'o';
     console.log('Possible board configuration: ' + testBoard);
@@ -321,7 +321,19 @@ function  botMove(gameBoard) {
     };
   };
 
-
+// No easy win :(
+  
+  for (a = 0; a < availableMoves.length; a++) {
+    testBoard = gameBoard.slice(0);
+    testBoard[availableMoves[a]] = 'x';
+    console.log('Possible board configuration: ' + testBoard);
+    if (checkWin(availableMoves[a], testBoard)) {
+      console.log('Winning move found for player: ' + availableMoves[a]);
+      console.log('Inhibiting move...');
+      return availableMoves[a];
+    };
+  };
+ 
   // Random AI fallback
   return availableMoves[randInt(0, availableMoves.length - 1)];
 }
