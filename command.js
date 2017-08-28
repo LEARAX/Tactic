@@ -31,7 +31,6 @@ bot.on('message', message => {
 
           case '1':
             console.log('Single-player mode selected');
-            messagePurge(gameState.toBeDeleted);
             gameState.awaitingPlayerCount = false;
             gameState.playerCount = 1;
             gameState.inGame = true;
@@ -154,7 +153,13 @@ bot.on('message', message => {
                   gameState.lastMove = playerMove;
                   gameStateStore(gameState);
                   sendTicTacToeBoard(message.channel, gameState);
-                } else message.channel.send('Invalid move: ' + (playerMove + 1));
+                } else {
+                  if (playerMove == 'NaN') {
+                    message.channel.send('Invalid move: ' + (playerMove + 1));
+                  } else {
+                    message.channel.send('Invalid move: ' + commandInput);
+                  };
+                };
               };
               break;
 
@@ -168,7 +173,13 @@ bot.on('message', message => {
                   gameState.lastMove = playerMove;
                   gameStateStore(gameState);
                   sendTicTacToeBoard(message.channel, gameState);
-                } else message.channel.send('Invalid move: ' + (playerMove + 1));
+                } else {
+                  if (playerMove == 'NaN') {
+                    message.channel.send('Invalid move: ' + (playerMove + 1));
+                  } else {
+                    message.channel.send('Invalid move: ' + commandInput);
+                  };
+                };
               };
               break;
           };
@@ -203,7 +214,13 @@ bot.on('message', message => {
                   gameStateStore(gameState);
                   sendTicTacToeBoard(message.channel, gameState);
                 };
-              } else message.channel.send('Invalid move: ' + (playerMove + 1));
+              } else {
+                if (playerMove == 'NaN') {
+                  message.channel.send('Invalid move: ' + (playerMove + 1));
+                } else {
+                  message.channel.send('Invalid move: ' + commandInput);
+                };
+              };
             };
           };
         };
@@ -321,8 +338,8 @@ function  botMove(gameBoard) {
     };
   };
 
-// No easy win :(
-  
+  // No easy win :(
+
   for (a = 0; a < availableMoves.length; a++) {
     testBoard = gameBoard.slice(0);
     testBoard[availableMoves[a]] = 'x';
@@ -333,7 +350,7 @@ function  botMove(gameBoard) {
       return availableMoves[a];
     };
   };
- 
+
   // Random AI fallback
   return availableMoves[randInt(0, availableMoves.length - 1)];
 }
