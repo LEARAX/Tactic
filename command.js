@@ -56,7 +56,7 @@ bot.on('message', message => {
               gameState.turn ++;
               gameState.playerTurn = 1;
               gameState.lastMove = playerMove;
-            }
+            } else messagePurge(gameState.toBeDeleted);
 
             gameStateStore(gameState);
             sendTicTacToeBoard(message.channel, gameState);
