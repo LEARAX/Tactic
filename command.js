@@ -309,23 +309,21 @@ function  botMove(gameBoard) {
   };
   console.log('Available moves for AI: ' + availableMoves);
 
-/*
- *  var testBoard = [];
- *
- *  for (i = 0; i < availableMoves.length - 1; i++) {
- *    testBoard = gameBoard;
- *    testBoard[availableMoves[i]] = 'o';
- *    console.log('Possible board configuration: ' + testBoard);
- *    if (checkWin(availableMoves[i], testBoard)) {
- *      console.log('Winning move found: ' + availableMoves[i]);
- *      return availableMoves[i];
- *    };
- *  };
- */
+  var testBoard = [];
+
+  for (a = 0; a < availableMoves.length - 1; a++) {
+    testBoard = gameBoard.slice(0);
+    testBoard[availableMoves[a]] = 'o';
+    console.log('Possible board configuration: ' + testBoard);
+    if (checkWin(availableMoves[a], testBoard)) {
+      console.log('Winning move found: ' + availableMoves[a]);
+      return availableMoves[a];
+    };
+  };
 
 
-    // Random AI fallback
-    return availableMoves[randInt(0, availableMoves.length - 1)];
+  // Random AI fallback
+  return availableMoves[randInt(0, availableMoves.length - 1)];
 }
 
 function checkWin(lastMove, gameBoard) {
