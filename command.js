@@ -30,7 +30,7 @@ bot.on('message', message => {
         switch (message.content) {
 
           case '1':
-            console.log('Single-player mode selected');
+            console.log('Single-player mode selected.');
             gameState.awaitingPlayerCount = false;
             gameState.playerCount = 1;
             gameState.inGame = true;
@@ -63,12 +63,13 @@ bot.on('message', message => {
             break;
 
           case '2':
-            console.log('2 player mode selected');
+            console.log('2 player mode selected.');
             messagePurge(gameState.toBeDeleted);
-            gameStateAppend('awaitingPlayerCount', false);
-            gameStateAppend('playerCount', 2);
-            gameStateAppend('awaitingPlayer2', true);
+            gameState.awaitingPlayerCount = false;
+            gameState.playerCount = 2;
+            gameState.awaitingPlayer2 = true;
 
+            gameStateStore(gameState);
             message.channel.send('Player 2, please say "READY".').then( msg => {
               markForPurge(msg);
             });
