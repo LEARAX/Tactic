@@ -35,7 +35,9 @@ bot.on('message', message => {
             gameState.playerCount = 1;
             gameState.inGame = true;
 
-            gameState.Player2 = { 'id': null, 'name': 'Dominik' };
+            let nameList = JSON.parse(fs.readFileSync('names.json', 'utf8')).names;
+            let nameID = randInt(0, nameList.length - 1);
+            gameState.Player2 = { 'id': null, 'name': nameList[nameID] };
 
             gameState.turn = 1;
             gameState.lastMove = null
