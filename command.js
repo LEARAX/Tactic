@@ -431,6 +431,15 @@ function checkWin(lastMove, gameBoard) {
   return false;
 }
 
+function delay(milliseconds) {
+  var start = new Date().getTime();
+  for (i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds) {
+      break;
+    };
+  };
+}
+
 function footerDetermineText(playerTurn, Player1, Player2) {
   switch (playerTurn) {
     case 1:
@@ -481,15 +490,6 @@ function gameStateAppend(name, value) {
   console.log('Value ' + value + ' for item ' + name + ' stored.');
 }
 
-function delay(milliseconds) {
-  var start = new Date().getTime();
-  for (i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > milliseconds) {
-      break;
-    };
-  };
-}
-
 function lastMoveDetermineName(lastMove, sign) {
   if (lastMove === null) {
     return 'No prior moves';	// Set at game start
@@ -507,6 +507,28 @@ function lastMoveDetermineValue(lastMove, sign) {
 
 function markForPurge(msg) {
   gameStateAppend('toBeDeleted', { 'id': msg.id, 'channel': msg.channel.id, 'guild': msg.guild.id });
+}
+
+function masterStateParse() {
+  let masterState = JSON.parse(fs.readFileSync('Master State.json', 'utf8'));
+  console.log('Master state parsed.');
+  console.log('Master state: ' + JSON.stringify(masterState));
+  return masterState;
+}
+
+function masterStateStore(masterState) {
+  fs.writeFileSync('Master State.json', JSON.stringify(masterState), 'utf8');  // Write it back
+  console.log('Master state stored.');
+}
+
+function masterStateAppend(name, value) {
+  let masterState = masterStateParse();  // Read it out
+
+  masterState[name] = value;  // Append the value
+
+  masterStateStore(masterState);  // Write it back
+
+  console.log('Value ' + value + ' for item ' + name + ' stored.');
 }
 
 function messagePurge(marked) {
