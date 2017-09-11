@@ -11,6 +11,7 @@ bot.on('disconnect', event => {
 
 bot.on('ready', () => {
   console.log('╦═╗┌─┐┌─┐┌┬┐┬ ┬┬\n╠╦╝├┤ ├─┤ ││└┬┘│\n╩╚═└─┘┴ ┴─┴┘ ┴ o');
+  masterStateStore({ });
   gameStateStore({ });
 });
 
@@ -21,117 +22,218 @@ bot.on('message', message => {
     console.log('From: ' + message.author.username);
     console.log('Message: ' + message.content);
     console.log('Length: ' + message.content.length);
+    var masterState = masterStateParse();
 
-    if (message.content == 1 || message.content == 2) {
-      var gameState = gameStateParse()
-      if (gameState.awaitingPlayerCount || message.author.id == gameState.Player1.id) {
-        message.delete();
+    if (masterState.hasOwnProperty(message.author.id)) {
 
-        switch (message.content) {
+      if (message.content == 1 || message.content == 2) {
+        var gameState = gameStateParse()
+        if (gameState.awaitingPlayerCount || message.author.id == gameState.Player1.id) {
+          message.delete();
 
-          case '1':
-            console.log('Single-player mode selected.');
-            gameState.awaitingPlayerCount = false;
-            gameState.playerCount = 1;
-            gameState.inGame = true;
+          switch (message.content) {
 
-            let nameList = JSON.parse(fs.readFileSync('names.json', 'utf8')).names;
-            let nameID = randInt(0, nameList.length - 1);
-            gameState.Player2 = { 'id': null, 'name': nameList[nameID] };
+            case '1':
+              console.log('Single-player mode selected.');
+              gameState.awaitingPlayerCount = false;
+              gameState.playerCount = 1;
+              gameState.inGame = true;
 
-            gameState.turn = 1;
-            gameState.lastMove = null
+              let nameList = JSON.parse(fs.readFileSync('names.json', 'utf8')).names;
+              let nameID = randInt(0, nameList.length - 1);
+              gameState.Player2 = { 'id': null, 'name': nameList[nameID] };
 
-            randInt(1, 2);
-            let playerTurn = randInt(1, 2);
-            gameState.playerTurn = playerTurn;
-            console.log('Player ' + playerTurn + ' goes first.');
+              gameState.turn = 1;
+              gameState.lastMove = null
 
-            let gameBoard = [];
-            for (i = 0; i < 9; i++) gameBoard.push('-');
-            gameState.gameBoard = gameBoard;
-            console.log('Empty game board generated.');
+              randInt(1, 2);
+              let playerTurn = randInt(1, 2);
+              gameState.playerTurn = playerTurn;
+              console.log('Player ' + playerTurn + ' goes first.');
 
-            if (playerTurn == 2) {	// AI goes first
-              let playerMove = botMove(gameState.gameBoard);
-              gameState.gameBoard[playerMove] = 'o';
-              gameState.turn ++;
-              gameState.playerTurn = 1;
-              gameState.lastMove = playerMove;
-            } else messagePurge(gameState.toBeDeleted);
+              let gameBoard = [];
+              for (i = 0; i < 9; i++) gameBoard.push('-');
+              gameState.gameBoard = gameBoard;
+              console.log('Empty game board generated.');
 
-            gameStateStore(gameState);
-            sendTicTacToeBoard(message.channel, gameState);
-            break;
+              if (playerTurn == 2) {	// AI goes first
 
-          case '2':
-            console.log('2 player mode selected.');
-            messagePurge(gameState.toBeDeleted);
-            gameState.awaitingPlayerCount = false;
-            gameState.playerCount = 2;
-            gameState.awaitingPlayer2 = true;
+                let playerMove = botMove(gameState.gameBoard);
+                gameState.gameBoard[playerMove] = 'o';
+                gameState.turn ++;
+                gameState.playerTurn = 1;
+                gameState.lastMove = playerMove;
 
-            gameStateStore(gameState);
-            message.channel.send('Player 2, please say "READY".').then( msg => {
-              markForPurge(msg);
-            });
-            break;
+              } else messagePurge(gameState.toBeDeleted);
 
-          default:
-            message.channel.send({embed: {
-              color: 0xff0000,
-              author: {
-                name: bot.user.username,
-                icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-              },
-              title: 'Error Handler',
-              url: 'https://github.com/The-Complex/Tactic',
-              fields: [{
-                name: 'INVALID NUMBER OF PLAYER',
-                value: 'Unrecognized value "' + commandInput + '". Please enter "1" or "2".'
-              }],
-            }
-            });
+              gameStateStore(gameState);
+              sendTicTacToeBoard(message.channel, gameState);
+              break;
+
+            case '2':
+              console.log('2 player mode selected.');
+              messagePurge(gameState.toBeDeleted);
+              gameState.awaitingPlayerCount = false;
+              gameState.playerCount = 2;
+              gameState.awaitingPlayer2 = true;
+
+              gameStateStore(gameState);
+              message.channel.send('Player 2, please say "READY".').then( msg => {
+                markForPurge(msg);
+              });
+              break;
+
+            default:
+              message.channel.send({embed: {
+                color: 0xff0000,
+                author: {
+                  name: bot.user.username,
+                  icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+                },
+                title: 'Error Handler',
+                url: 'https://github.com/The-Complex/Tactic',
+                fields: [{
+                  name: 'INVALID NUMBER OF PLAYER',
+                  value: 'Unrecognized value "' + commandInput + '". Please enter "1" or "2".'
+                }],
+              }
+              });
+          };
         };
       };
-    };
 
 
-    if (message.content == 'READY') {
-      var gameState = gameStateParse();		// Need to check if that meant something
+      if (message.content == 'READY') {
+        var gameState = gameStateParse();		// Need to check if that meant something
 
-      if (gameState.awaitingPlayer2) {		// If it did...
-        console.log('Player 2: ' + message.author.username);
-        message.delete();			// Delete it
-        messagePurge(gameState.toBeDeleted);	// Get rid of the prompt
-        let channelMembers = message.channel.members;
-        message.channel.send('Player 1 identified as ' + channelMembers.get(gameState.Player1.id).toString());
-        message.channel.send('Player 2 identified as ' + message.author.toString());
+        if (gameState.awaitingPlayer2) {		// If it did...
+          console.log('Player 2: ' + message.author.username);
+          message.delete();			// Delete it
+          messagePurge(gameState.toBeDeleted);	// Get rid of the prompt
+          let channelMembers = message.channel.members;
+          message.channel.send('Player 1 identified as ' + channelMembers.get(gameState.Player1.id).toString());
+          message.channel.send('Player 2 identified as ' + message.author.toString());
 
 
-        gameState.awaitingPlayer2 = false;
-        gameState.Player2 = { 'id': message.author.id, 'name': message.author.username };
-        gameState.inGame = true;
+          gameState.awaitingPlayer2 = false;
+          gameState.Player2 = { 'id': message.author.id, 'name': message.author.username };
+          gameState.inGame = true;
 
-        gameState.turn = 1;
-        gameState.lastMove = null;
+          gameState.turn = 1;
+          gameState.lastMove = null;
 
-        randInt(1, 2);
-        let playerTurn = randInt(1, 2);
-        gameState.playerTurn = playerTurn;
-        console.log('Player ' + playerTurn + ' goes first.');
+          randInt(1, 2);
+          let playerTurn = randInt(1, 2);
+          gameState.playerTurn = playerTurn;
+          console.log('Player ' + playerTurn + ' goes first.');
 
-        let gameBoard = [];
-        for (i = 0; i < 9; i++) gameBoard.push('-');
-        gameState.gameBoard = gameBoard;
-        console.log('Empty game board generated.');
-        sendTicTacToeBoard(message.channel, gameState);
-        gameStateStore(gameState);
+          let gameBoard = [];
+          for (i = 0; i < 9; i++) gameBoard.push('-');
+          gameState.gameBoard = gameBoard;
+          console.log('Empty game board generated.');
+          sendTicTacToeBoard(message.channel, gameState);
+          gameStateStore(gameState);
+        };
       };
-    };
+      if (message.content.slice(0, 2) == '*$') {
+        message.delete();
 
+        console.log('Command detected.');
+        const commandInput = message.content.slice(2);
+        const commandInputSplit = commandInput.split(' ');
+        console.log('Command: ' + commandInput);
 
-    if (message.content.slice(0, 2) == '*$') {
+        console.log('Parsing initial game state...');
+        var gameState = gameStateParse();
+
+        if (gameState.inGame && gameState.gameID == 1) {
+          if (gameState.playerCount == 2) {
+            console.log('We\'re ingame, with 2 players. Begin parsing move.');
+            switch (gameState.playerTurn) {
+              case 1:
+                if (message.author.id == gameState.Player1.id) {
+                  try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
+                  if (gameState.gameBoard[playerMove] == '-') {
+                    gameState.gameBoard[playerMove] = 'x';
+                    gameState.turn ++;
+                    gameState.playerTurn = 2;
+                    gameState.lastMove = playerMove;
+                    gameStateStore(gameState);
+                    sendTicTacToeBoard(message.channel, gameState);
+                  } else {
+                    if (playerMove == 'NaN') {
+                      message.channel.send('Invalid move: ' + (playerMove + 1));
+                    } else {
+                      message.channel.send('Invalid move: ' + commandInput);
+                    };
+                  };
+                };
+                break;
+
+              case 2:
+                if (message.author.id == gameState.Player2.id) {
+                  try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
+                  if (gameState.gameBoard[playerMove] == '-') {
+                    gameState.gameBoard[playerMove] = 'o';
+                    gameState.turn ++;
+                    gameState.playerTurn = 1;
+                    gameState.lastMove = playerMove;
+                    gameStateStore(gameState);
+                    sendTicTacToeBoard(message.channel, gameState);
+                  } else {
+                    if (playerMove == 'NaN') {
+                      message.channel.send('Invalid move: ' + (playerMove + 1));
+                    } else {
+                      message.channel.send('Invalid move: ' + commandInput);
+                    };
+                  };
+                };
+                break;
+            };
+          } else if (gameState.playerCount == 1) {
+            console.log('We\'re ingame, with 1 player. Begin parsing move.');
+            if (gameState.playerTurn == 1) {
+              if (message.author.id == gameState.Player1.id) {
+                try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
+
+                if (gameState.gameBoard[playerMove] == '-') {
+                  gameState.gameBoard[playerMove] = 'x';
+                  gameState.turn ++;
+                  gameState.playerTurn = 2;
+                  gameState.lastMove = playerMove;
+
+                  if (checkWin(gameState.lastMove, gameState.gameBoard)) {
+                    sendTicTacToeBoard(message.channel, gameState);
+                    var gameOver = true;
+                  } else if (gameState.gameBoard.indexOf('-') == -1) {
+                    sendTicTacToeBoard(message.channel, gameState);
+                    var gameOver = true;
+                  };
+
+                  if (!gameOver) {
+                    // Begin AI response
+                    playerMove = botMove(gameState.gameBoard);
+
+                    gameState.gameBoard[playerMove] = 'o';
+                    gameState.turn ++;
+                    gameState.playerTurn = 1;
+                    gameState.lastMove = playerMove;
+                    gameStateStore(gameState);
+                    sendTicTacToeBoard(message.channel, gameState);
+                  };
+                } else {
+                  if (playerMove == 'NaN') {
+                    message.channel.send('Invalid move: ' + (playerMove + 1));
+                  } else {
+                    message.channel.send('Invalid move: ' + commandInput);
+                  };
+                };
+              };
+            };
+          };
+        };
+      };
+    } else if (message.content.slice(0, 2) == '*$') {
       message.delete();
 
       console.log('Command detected.');
@@ -139,182 +241,93 @@ bot.on('message', message => {
       const commandInputSplit = commandInput.split(' ');
       console.log('Command: ' + commandInput);
 
-      console.log('Parsing initial game state...');
-      var gameState = gameStateParse();
+      switch (commandInputSplit[0]) {
+        case 'ls':
+        case 'list':
+          message.channel.send({embed: {
+            color: 0x0000ff,
+            author: {
+              name: bot.user.username,
+              icon_url: bot.user.avatarURL
+            },
+            title: 'File System Wizard',
+            url: 'https://github.com/The-Complex/Tactic',
+            fields: [
 
-      if (gameState.inGame && gameState.gameID == 1) {
-        if (gameState.playerCount == 2) {
-          console.log('We\'re ingame, with 2 players. Begin parsing move.');
-          switch (gameState.playerTurn) {
-            case 1:
-              if (message.author.id == gameState.Player1.id) {
-                try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
-                if (gameState.gameBoard[playerMove] == '-') {
-                  gameState.gameBoard[playerMove] = 'x';
-                  gameState.turn ++;
-                  gameState.playerTurn = 2;
-                  gameState.lastMove = playerMove;
-                  gameStateStore(gameState);
-                  sendTicTacToeBoard(message.channel, gameState);
-                } else {
-                  if (playerMove == 'NaN') {
-                    message.channel.send('Invalid move: ' + (playerMove + 1));
-                  } else {
-                    message.channel.send('Invalid move: ' + commandInput);
-                  };
-                };
-              };
+              {
+                name: '```[0]: Tic-Tac-Toe```',
+                value: 'X\'s & O\'s'
+              }
+            ],
+          }
+          });
+          break;
+
+        case 'run':
+          switch (commandInputSplit[1]) {
+
+            case '0':
+              console.log('Player ' + message.author.username + ' has selected Tic-Tac-Toe...');
+
+              masterStateAppend();
+              gameStateAppend('gameID', 1);
+              gameStateAppend('Player1', { 'id': message.author.id, 'name': message.author.username });
+              gameStateAppend('awaitingPlayerCount', true);
+              message.reply('1 or 2 players?').then( msg => {
+                markForPurge(msg);
+              });
               break;
 
-            case 2:
-              if (message.author.id == gameState.Player2.id) {
-                try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
-                if (gameState.gameBoard[playerMove] == '-') {
-                  gameState.gameBoard[playerMove] = 'o';
-                  gameState.turn ++;
-                  gameState.playerTurn = 1;
-                  gameState.lastMove = playerMove;
-                  gameStateStore(gameState);
-                  sendTicTacToeBoard(message.channel, gameState);
-                } else {
-                  if (playerMove == 'NaN') {
-                    message.channel.send('Invalid move: ' + (playerMove + 1));
-                  } else {
-                    message.channel.send('Invalid move: ' + commandInput);
-                  };
-                };
-              };
-              break;
+            default:
+              message.channel.send({embed: {
+                color: 0xff0000,
+                author: {
+                  name: bot.user.username,
+                  icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+                },
+                title: 'Error Handler',
+                url: 'https://github.com/The-Complex/Tactic',
+                fields: [{
+                  name: 'UNRECOGNIZED PROGRAM',
+                  value: 'Program ID "' + commandInputSplit[1] + '" was unrecognized.'
+                }],
+              }
+              });
           };
-        } else if (gameState.playerCount == 1) {
-          console.log('We\'re ingame, with 1 player. Begin parsing move.');
-          if (gameState.playerTurn == 1) {
-            if (message.author.id == gameState.Player1.id) {
-              try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
+          break;
 
-              if (gameState.gameBoard[playerMove] == '-') {
-                gameState.gameBoard[playerMove] = 'x';
-                gameState.turn ++;
-                gameState.playerTurn = 2;
-                gameState.lastMove = playerMove;
+        case '':
+          message.channel.send({embed: {
+            color: 0xff0000,
+            author: {
+              name: bot.user.username,
+              icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+            },
+            title: 'Error Handler',
+            url: 'https://github.com/The-Complex/Tactic',
+            fields: [{
+              name: 'COMMAND INVALID',
+              value: 'Please enter a command!'
+            }],
+          }
+          });
+          break;
 
-                if (checkWin(gameState.lastMove, gameState.gameBoard)) {
-                  sendTicTacToeBoard(message.channel, gameState);
-                  var gameOver = true;
-                } else if (gameState.gameBoard.indexOf('-') == -1) {
-                  sendTicTacToeBoard(message.channel, gameState);
-                  var gameOver = true;
-                };
-
-                if (!gameOver) {
-                  // Begin AI response
-                  playerMove = botMove(gameState.gameBoard);
-
-                  gameState.gameBoard[playerMove] = 'o';
-                  gameState.turn ++;
-                  gameState.playerTurn = 1;
-                  gameState.lastMove = playerMove;
-                  gameStateStore(gameState);
-                  sendTicTacToeBoard(message.channel, gameState);
-                };
-              } else {
-                if (playerMove == 'NaN') {
-                  message.channel.send('Invalid move: ' + (playerMove + 1));
-                } else {
-                  message.channel.send('Invalid move: ' + commandInput);
-                };
-              };
-            };
-          };
-        };
-      } else if (!gameState.awaitingPlayerCount) {
-        switch (commandInputSplit[0]) {
-          case 'ls':
-          case 'list':
-            message.channel.send({embed: {
-              color: 0x0000ff,
-              author: {
-                name: bot.user.username,
-                icon_url: bot.user.avatarURL
-              },
-              title: 'File System Wizard',
-              url: 'https://github.com/The-Complex/Tactic',
-              fields: [
-
-                {
-                  name: '```[0]: Tic-Tac-Toe```',
-                  value: 'X\'s & O\'s'
-                }
-              ],
-            }
-            });
-            break;
-
-          case 'run':
-            switch (commandInputSplit[1]) {
-
-              case '0':
-                console.log('Player ' + message.author.username + ' has selected Tic-Tac-Toe...');
-
-                gameStateAppend('gameID', 1);
-                gameStateAppend('Player1', { 'id': message.author.id, 'name': message.author.username });
-                gameStateAppend('awaitingPlayerCount', true);
-                message.reply('1 or 2 players?').then( msg => {
-                  markForPurge(msg);
-                });
-                break;
-
-              default:
-                message.channel.send({embed: {
-                  color: 0xff0000,
-                  author: {
-                    name: bot.user.username,
-                    icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-                  },
-                  title: 'Error Handler',
-                  url: 'https://github.com/The-Complex/Tactic',
-                  fields: [{
-                    name: 'UNRECOGNIZED PROGRAM',
-                    value: 'Program ID "' + commandInputSplit[1] + '" was unrecognized.'
-                  }],
-                }
-                });
-            };
-            break;
-
-          case '':
-            message.channel.send({embed: {
-              color: 0xff0000,
-              author: {
-                name: bot.user.username,
-                icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-              },
-              title: 'Error Handler',
-              url: 'https://github.com/The-Complex/Tactic',
-              fields: [{
-                name: 'COMMAND INVALID',
-                value: 'Please enter a command!'
-              }],
-            }
-            });
-            break;
-
-          default:
-            message.channel.send({embed: {
-              color: 0xff0000,
-              author: {
-                name: bot.user.username,
-                icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-              },
-              title: 'Error Handler',
-              url: 'https://github.com/The-Complex/Tactic',
-              fields: [{
-                name: 'COMMAND INVALID',
-                value: 'Your command "' + commandInputSplit[0] + '" was unrecognized.'
-              }],
-            }
-            });
-        };
+        default:
+          message.channel.send({embed: {
+            color: 0xff0000,
+            author: {
+              name: bot.user.username,
+              icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+            },
+            title: 'Error Handler',
+            url: 'https://github.com/The-Complex/Tactic',
+            fields: [{
+              name: 'COMMAND INVALID',
+              value: 'Your command "' + commandInputSplit[0] + '" was unrecognized.'
+            }],
+          }
+          });
       };
     };
   };
@@ -468,26 +481,26 @@ function gameOverResponse(channel, victor, Player1, Player2) {
   gameStateStore({ });
 }
 
-function gameStateParse() {
-  let gameState = JSON.parse(fs.readFileSync('Game State.json', 'utf8'));
+function gameStateParse(file) {
+  let gameState = JSON.parse(fs.readFileSync('GS' + file + '.json', 'utf8'));
   console.log('Gamestate parsed.');
   console.log('Gamestate: ' + JSON.stringify(gameState));
   return gameState;
 }
 
-function gameStateStore(gameState) {
-  fs.writeFileSync('Game State.json', JSON.stringify(gameState), 'utf8');  // Write it back
+function gameStateStore(file, gameState) {
+  fs.writeFileSync('GS' + file + '.json', JSON.stringify(gameState), 'utf8');  // Write it back
   console.log('Game state stored.');
 }
 
-function gameStateAppend(name, value) {
-  let gameState = gameStateParse();  // Read it out
+function gameStateAppend(file, name, value) {
+  let gameState = gameStateParse(file);  // Read it out
 
   gameState[name] = value;  // Append the value
 
-  gameStateStore(gameState);  // Write it back
+  gameStateStore(file, gameState);  // Write it back
 
-  console.log('Value ' + value + ' for item ' + name + ' stored.');
+  console.log('Value ' + value + ' for item ' + name + ' stored to game state ' + file +'.');
 }
 
 function lastMoveDetermineName(lastMove, sign) {

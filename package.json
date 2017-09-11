@@ -5,7 +5,7 @@
   "main": "command.js",
   "dependencies": {
     "config.json": "^0.0.4",
-    "discord.js": "^11.0.0"
+    "discord.js": "^11.2.1"
   },
   "repository": {
     "type": "git",
