@@ -91,7 +91,7 @@ bot.on('message', message => {
                   icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
                 },
                 title: 'Error Handler',
-                url: 'https://github.com/The-Complex/Tactic',
+                url: 'https://github.com/LEARAX/Tactic',
                 fields: [{
                   name: 'INVALID NUMBER OF PLAYER',
                   value: 'Unrecognized value "' + commandInput + '". Please enter "1" or "2".'
@@ -251,7 +251,7 @@ bot.on('message', message => {
               icon_url: bot.user.avatarURL
             },
             title: 'File System Wizard',
-            url: 'https://github.com/The-Complex/Tactic',
+            url: 'https://github.com/LEARAX/Tactic',
             fields: [
 
               {
@@ -286,7 +286,7 @@ bot.on('message', message => {
                   icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
                 },
                 title: 'Error Handler',
-                url: 'https://github.com/The-Complex/Tactic',
+                url: 'https://github.com/LEARAX/Tactic',
                 fields: [{
                   name: 'UNRECOGNIZED PROGRAM',
                   value: 'Program ID "' + commandInputSplit[1] + '" was unrecognized.'
@@ -304,7 +304,7 @@ bot.on('message', message => {
               icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
             },
             title: 'Error Handler',
-            url: 'https://github.com/The-Complex/Tactic',
+            url: 'https://github.com/LEARAX/Tactic',
             fields: [{
               name: 'COMMAND INVALID',
               value: 'Please enter a command!'
@@ -321,7 +321,7 @@ bot.on('message', message => {
               icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
             },
             title: 'Error Handler',
-            url: 'https://github.com/The-Complex/Tactic',
+            url: 'https://github.com/LEARAX/Tactic',
             fields: [{
               name: 'COMMAND INVALID',
               value: 'Your command "' + commandInputSplit[0] + '" was unrecognized.'
