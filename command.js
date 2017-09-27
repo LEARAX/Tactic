@@ -11,9 +11,19 @@ bot.on('disconnect', event => {
 
 bot.on('ready', () => {
   console.log('╦═╗┌─┐┌─┐┌┬┐┬ ┬┬\n╠╦╝├┤ ├─┤ ││└┬┘│\n╩╚═└─┘┴ ┴─┴┘ ┴ o');
-  masterStateStore({ });
-  gameStateStore({ });
-});
+  masterStateStore({ 'nextGameID': 0});
+  fs.readdir('./', function (err, files) {
+    if (err) throw err;
+    for (i = 0; i + 1 < files.length; i++) {
+      if (files[i].slice(0, 2) == 'GS') {
+        fs.unlink(files[i], err => {
+          console.log('Encountered error reading file: ' + files[i]);
+          console.log('Error: ' + err)
+        })
+      }
+    }
+  })
+})
 
 bot.on('message', message => {
   if (!message.author.bot) {
@@ -22,12 +32,12 @@ bot.on('message', message => {
     console.log('From: ' + message.author.username);
     console.log('Message: ' + message.content);
     console.log('Length: ' + message.content.length);
-    var masterState = masterStateParse();
+
+    var masterState = masterStateParse()
 
     if (masterState.hasOwnProperty(message.author.id)) {
-
+      var gameState = gameStateParse(masterState.message.author.id);
       if (message.content == 1 || message.content == 2) {
-        var gameState = gameStateParse()
         if (gameState.awaitingPlayerCount || message.author.id == gameState.Player1.id) {
           message.delete();
 
@@ -104,7 +114,7 @@ bot.on('message', message => {
 
 
       if (message.content == 'READY') {
-        var gameState = gameStateParse();		// Need to check if that meant something
+        var gameState = gameStateParse(masterState.message.author.id);		// Need to check if that meant something
 
         if (gameState.awaitingPlayer2) {		// If it did...
           console.log('Player 2: ' + message.author.username);
@@ -268,14 +278,12 @@ bot.on('message', message => {
 
             case '0':
               console.log('Player ' + message.author.username + ' has selected Tic-Tac-Toe...');
-
-              masterStateAppend();
-              gameStateAppend('gameID', 1);
-              gameStateAppend('Player1', { 'id': message.author.id, 'name': message.author.username });
-              gameStateAppend('awaitingPlayerCount', true);
-              message.reply('1 or 2 players?').then( msg => {
-                markForPurge(msg);
-              });
+              masterStateAppend('nextGameID', masterState.nextGameID++);
+              masterStateAppend(message.author.id, masterState.nextGameID);
+              gameStateAppend(message.author.id, 'gameID', 1);
+              gameStateAppend(message.author.id, 'Player1', { 'id': message.author.id, 'name': message.author.username });
+              gameStateAppend(message.author.id, 'awaitingPlayerCount', true);
+              message.reply('1 or 2 players?').then( msg => markForPurge(msg));
               break;
 
             default:
@@ -518,8 +526,8 @@ function lastMoveDetermineValue(lastMove, sign) {
   return visualBoardGen(lastBoard);
 }
 
-function markForPurge(msg) {
-  gameStateAppend('toBeDeleted', { 'id': msg.id, 'channel': msg.channel.id, 'guild': msg.guild.id });
+function markForPurge(file, msg) {
+  gameStateAppend(file, 'toBeDeleted', { 'id': msg.id, 'channel': msg.channel.id, 'guild': msg.guild.id });
 }
 
 function masterStateParse() {
