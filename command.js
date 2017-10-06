@@ -1,20 +1,25 @@
-const Discord = require('discord.js');
-const bot = new Discord.Client();
-const fs = require('fs');
+const Discord = require('discord.js'),
+  bot = new Discord.Client(),
+  fs = require('fs')
 
-const config = require('config.json')('./secrets.json');
-const token = config.token;
+const config = require('config.json')('./secrets.json'),
+  token = config.token
 
 bot.on('disconnect', event => {
-  console.log('!Disconnected: ' + event.reason + ' (' + event.code + ')!');
-});
+  console.log('!Disconnected: ' + event.reason + ' (' + event.code + ')!')
+})
 
 bot.on('ready', () => {
-  console.log('╦═╗┌─┐┌─┐┌┬┐┬ ┬┬\n╠╦╝├┤ ├─┤ ││└┬┘│\n╩╚═└─┘┴ ┴─┴┘ ┴ o');
-  masterStateStore({ 'nextGameID': 0});
+  console.log('╦═╗┌─┐┌─┐┌┬┐┬ ┬┬\n╠╦╝├┤ ├─┤ ││└┬┘│\n╩╚═└─┘┴ ┴─┴┘ ┴ o')
+
+  // Cleans master state
+  masterStateStore({ 'nextGameID': 0})
+
+  // Removes any game state files
   fs.readdir('./', function (err, files) {
     if (err) throw err;
-    for (i = 0; i + 1 < files.length; i++) {
+
+    for (i = 0; i < files.length; i++) {
       if (files[i].slice(0, 2) == 'GS') {
         fs.unlink(files[i], err => {
           console.log('Encountered error reading file: ' + files[i]);
@@ -22,6 +27,7 @@ bot.on('ready', () => {
         })
       }
     }
+
   })
 })
 
@@ -36,7 +42,10 @@ bot.on('message', message => {
     var masterState = masterStateParse()
 
     if (masterState.hasOwnProperty(message.author.id)) {
-      var gameState = gameStateParse(masterState.message.author.id);
+      console.log('Player found in Master State...')
+
+      var gameState = gameStateParse(masterState[message.author.id])
+
       if (message.content == 1 || message.content == 2) {
         if (gameState.awaitingPlayerCount || message.author.id == gameState.Player1.id) {
           message.delete();
@@ -76,7 +85,7 @@ bot.on('message', message => {
 
               } else messagePurge(gameState.toBeDeleted);
 
-              gameStateStore(gameState);
+              gameStateStore(masterState[message.author.id], gameState);
               sendTicTacToeBoard(message.channel, gameState);
               break;
 
@@ -114,7 +123,8 @@ bot.on('message', message => {
 
 
       if (message.content == 'READY') {
-        var gameState = gameStateParse(masterState.message.author.id);		// Need to check if that meant something
+        // TODO
+        var gameState = gameStateParse(masterState[message.author.id]);		// Need to check if that meant something
 
         if (gameState.awaitingPlayer2) {		// If it did...
           console.log('Player 2: ' + message.author.username);
@@ -277,13 +287,20 @@ bot.on('message', message => {
           switch (commandInputSplit[1]) {
 
             case '0':
-              console.log('Player ' + message.author.username + ' has selected Tic-Tac-Toe...');
-              masterStateAppend('nextGameID', masterState.nextGameID++);
-              masterStateAppend(message.author.id, masterState.nextGameID);
-              gameStateAppend(message.author.id, 'gameID', 1);
-              gameStateAppend(message.author.id, 'Player1', { 'id': message.author.id, 'name': message.author.username });
-              gameStateAppend(message.author.id, 'awaitingPlayerCount', true);
-              message.reply('1 or 2 players?').then( msg => markForPurge(msg));
+              console.log('Player ' + message.author.username + ' has selected Tic-Tac-Toe...')
+
+              masterState[message.author.id] = masterState.nextGameID
+              masterState.nextGameID++
+              masterStateStore(masterState)
+
+              let gameState = {
+                'gameID': 1,
+                'Player1': { 'id': message.author.id, 'name': message.author.username },
+                'awaitingPlayerCount': true
+              }
+              gameStateStore(masterState[message.author.id], gameState)
+
+              message.reply('1 or 2 players?').then( msg => markForPurge(masterState[message.author.id], msg));
               break;
 
             default:
@@ -490,6 +507,7 @@ function gameOverResponse(channel, victor, Player1, Player2) {
 }
 
 function gameStateParse(file) {
+  console.log(file)
   let gameState = JSON.parse(fs.readFileSync('GS' + file + '.json', 'utf8'));
   console.log('Gamestate parsed.');
   console.log('Gamestate: ' + JSON.stringify(gameState));
@@ -572,8 +590,8 @@ function randInt(min, max) {
 function sendTicTacToeBoard(channel, gameState) {
   if (gameState.lastMove != null) {
     messagePurge(gameState.toBeDeleted);
-    console.log('Cleaned old board.');
-  };
+    console.log('Cleaned old board.')
+  }
 
   channel.send({'embed': {
     'title': 'Tic-Tac-Toe',
@@ -599,13 +617,13 @@ function sendTicTacToeBoard(channel, gameState) {
     ]
   }
   }).then( msg => {
-    markForPurge(msg);
-  });
+    markForPurge(gameState.Player1.id, msg)
+  })
 
   if (checkWin(gameState.lastMove, gameState.gameBoard)) {
-    gameOverResponse(channel, gameState.gameBoard[gameState.lastMove], gameState.Player1.name, gameState.Player2.name);
+    gameOverResponse(channel, gameState.gameBoard[gameState.lastMove], gameState.Player1.name, gameState.Player2.name)
   } else if (gameState.gameBoard.indexOf('-') == -1) {
-    gameOverResponse(channel, '-', gameState.Player1.name, gameState.Player2.name);
+    gameOverResponse(channel, '-', gameState.Player1.name, gameState.Player2.name)
   }
 }
 
