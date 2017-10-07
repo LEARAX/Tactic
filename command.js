@@ -12,22 +12,25 @@ bot.on('disconnect', event => {
 bot.on('ready', () => {
   console.log('╦═╗┌─┐┌─┐┌┬┐┬ ┬┬\n╠╦╝├┤ ├─┤ ││└┬┘│\n╩╚═└─┘┴ ┴─┴┘ ┴ o')
 
-  // Cleans master state
-  masterStateStore({ 'nextGameID': 0})
-
-  // Removes any game state files
-  fs.readdir('./', function (err, files) {
-    if (err) throw err
-
-    for (i = 0; i < files.length - 1; i++) {
-      if (files[i].slice(0, 2) == 'GS') {
-        fs.unlink(files[i], err => {
-          if (err) throw err
-        })
-      }
-    }
-
-  })
+  // The following erases the state files on startup. Should not be necessary.
+/*
+ *   // Cleans master state
+ *   masterStateStore({ 'nextGameID': 0})
+ *
+ *   // Removes any game state files
+ *   fs.readdir('./', function (err, files) {
+ *     if (err) throw err
+ *
+ *     for (i = 0; i < files.length - 1; i++) {
+ *       if (files[i].slice(0, 2) == 'GS') {
+ *         fs.unlink(files[i], err => {
+ *           if (err) throw err
+ *         })
+ *       }
+ *     }
+ *
+ *   })
+ */
 })
 
 bot.on('message', message => {
