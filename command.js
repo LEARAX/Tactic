@@ -12,25 +12,22 @@ bot.on('disconnect', event => {
 bot.on('ready', () => {
   console.log('╦═╗┌─┐┌─┐┌┬┐┬ ┬┬\n╠╦╝├┤ ├─┤ ││└┬┘│\n╩╚═└─┘┴ ┴─┴┘ ┴ o')
 
-  // The following erases the state files on startup. Should not be necessary.
-/*
- *   // Cleans master state
- *   masterStateStore({ 'nextGameID': 0})
- *
- *   // Removes any game state files
- *   fs.readdir('./', function (err, files) {
- *     if (err) throw err
- *
- *     for (i = 0; i < files.length - 1; i++) {
- *       if (files[i].slice(0, 2) == 'GS') {
- *         fs.unlink(files[i], err => {
- *           if (err) throw err
- *         })
- *       }
- *     }
- *
- *   })
- */
+  // Cleans master state
+  masterStateStore({ 'nextGameID': 0})
+
+  // Removes any game state files
+  fs.readdir('./', function (err, files) {
+    if (err) throw err
+
+    for (i = 0; i < files.length - 1; i++) {
+      if (files[i].slice(0, 2) == 'GS') {
+        fs.unlink(files[i], err => {
+          if (err) throw err
+        })
+      }
+    }
+
+  })
 })
 
 bot.on('message', message => {
@@ -164,7 +161,7 @@ bot.on('message', message => {
 
         console.log('Command detected.');
         const commandInput = message.content.slice(2),
-        commandInputSplit = commandInput.split(' ')
+          commandInputSplit = commandInput.split(' ')
         console.log('Command: ' + commandInput)
 
         console.log('Parsing initial game state...');
@@ -364,42 +361,43 @@ bot.on('message', message => {
   };
 });
 
-function  botMove(gameBoard) {
+function botMove(gameBoard) {
   var availableMoves = []
   for (i = 0; i < gameBoard.length; i++) {
     if (gameBoard[i] == '-') {
-      availableMoves.push(i);
-    };
-  };
-  console.log('Available moves for AI: ' + availableMoves);
+      availableMoves.push(i)
+    }
+  }
 
-  var testBoard = [];
+  console.log('Available moves for AI: ' + availableMoves)
+
+  var testBoard = []
 
   for (a = 0; a < availableMoves.length; a++) {
-    testBoard = gameBoard.slice(0);
-    testBoard[availableMoves[a]] = 'o';
+    testBoard = gameBoard.slice(0)
+    testBoard[availableMoves[a]] = 'o'
     console.log('Possible board configuration: ' + testBoard);
     if (checkWin(availableMoves[a], testBoard)) {
       console.log('Winning move found: ' + availableMoves[a]);
-      return availableMoves[a];
-    };
-  };
+      return availableMoves[a]
+    }
+  }
 
   // No easy win :(
 
   for (a = 0; a < availableMoves.length; a++) {
-    testBoard = gameBoard.slice(0);
-    testBoard[availableMoves[a]] = 'x';
+    testBoard = gameBoard.slice(0)
+    testBoard[availableMoves[a]] = 'x'
     console.log('Possible board configuration: ' + testBoard);
     if (checkWin(availableMoves[a], testBoard)) {
       console.log('Winning move found for player: ' + availableMoves[a]);
       console.log('Inhibiting move...');
-      return availableMoves[a];
-    };
-  };
+      return availableMoves[a]
+    }
+  }
 
   // Random AI fallback
-  return availableMoves[randInt(0, availableMoves.length - 1)];
+  return availableMoves[randInt(0, availableMoves.length - 1)]
 }
 
 function checkWin(lastMove, gameBoard) {
@@ -510,13 +508,13 @@ function gameOverResponse(gameID, channel, gameState, masterState) {
       break;
   }
 
-delete masterState[gameState.Player1.id]
+  delete masterState[gameState.Player1.id]
 
-if (gameState.Player2.id != null) {
-  delete masterState[gameState.Player2.id]
-}
+  if (gameState.Player2.id != null) {
+    delete masterState[gameState.Player2.id]
+  }
 
-masterStateStore(masterState)
+  masterStateStore(masterState)
 
   fs.unlink('GS' + gameID + '.json', err => {
     if (err) throw err
