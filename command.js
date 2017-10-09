@@ -361,42 +361,43 @@ bot.on('message', message => {
   };
 });
 
-function  botMove(gameBoard) {
+function botMove(gameBoard) {
   var availableMoves = []
   for (i = 0; i < gameBoard.length; i++) {
     if (gameBoard[i] == '-') {
-      availableMoves.push(i);
-    };
-  };
-  console.log('Available moves for AI: ' + availableMoves);
+      availableMoves.push(i)
+    }
+  }
 
-  var testBoard = [];
+  console.log('Available moves for AI: ' + availableMoves)
+
+  var testBoard = []
 
   for (a = 0; a < availableMoves.length; a++) {
-    testBoard = gameBoard.slice(0);
-    testBoard[availableMoves[a]] = 'o';
+    testBoard = gameBoard.slice(0)
+    testBoard[availableMoves[a]] = 'o'
     console.log('Possible board configuration: ' + testBoard);
     if (checkWin(availableMoves[a], testBoard)) {
       console.log('Winning move found: ' + availableMoves[a]);
-      return availableMoves[a];
-    };
-  };
+      return availableMoves[a]
+    }
+  }
 
   // No easy win :(
 
   for (a = 0; a < availableMoves.length; a++) {
-    testBoard = gameBoard.slice(0);
-    testBoard[availableMoves[a]] = 'x';
+    testBoard = gameBoard.slice(0)
+    testBoard[availableMoves[a]] = 'x'
     console.log('Possible board configuration: ' + testBoard);
     if (checkWin(availableMoves[a], testBoard)) {
       console.log('Winning move found for player: ' + availableMoves[a]);
       console.log('Inhibiting move...');
-      return availableMoves[a];
-    };
-  };
+      return availableMoves[a]
+    }
+  }
 
   // Random AI fallback
-  return availableMoves[randInt(0, availableMoves.length - 1)];
+  return availableMoves[randInt(0, availableMoves.length - 1)]
 }
 
 function checkWin(lastMove, gameBoard) {
