@@ -161,7 +161,7 @@ bot.on('message', message => {
 
         console.log('Command detected.');
         const commandInput = message.content.slice(2),
-        commandInputSplit = commandInput.split(' ')
+          commandInputSplit = commandInput.split(' ')
         console.log('Command: ' + commandInput)
 
         console.log('Parsing initial game state...');
@@ -507,13 +507,13 @@ function gameOverResponse(gameID, channel, gameState, masterState) {
       break;
   }
 
-delete masterState[gameState.Player1.id]
+  delete masterState[gameState.Player1.id]
 
-if (gameState.Player2.id != null) {
-  delete masterState[gameState.Player2.id]
-}
+  if (gameState.Player2.id != null) {
+    delete masterState[gameState.Player2.id]
+  }
 
-masterStateStore(masterState)
+  masterStateStore(masterState)
 
   fs.unlink('GS' + gameID + '.json', err => {
     if (err) throw err
