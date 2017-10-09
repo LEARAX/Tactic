@@ -13,7 +13,7 @@ bot.on('ready', () => {
   console.log('╦═╗┌─┐┌─┐┌┬┐┬ ┬┬\n╠╦╝├┤ ├─┤ ││└┬┘│\n╩╚═└─┘┴ ┴─┴┘ ┴ o')
 
   // Cleans master state
-  masterStateStore({ 'nextGameID': 0})
+  masterStateStore({ 'nextGameID': 0, 'channelsAwaitingPlayerCount': {} })
 
   // Removes any game state files
   fs.readdir('./', function (err, files) {
@@ -53,7 +53,7 @@ bot.on('message', message => {
           switch (message.content) {
 
             case '1':
-              console.log('Single-player mode selected.');
+              console.log('1 player mode selected.');
               gameState.awaitingPlayerCount = false
               gameState.playerCount = 1
               gameState.inGame = true
@@ -96,6 +96,9 @@ bot.on('message', message => {
               gameState.playerCount = 2
               gameState.awaitingPlayer2 = true
 
+              masterState.channelsAwaitingPlayerCount[message.channel.id] = gameID
+              masterStateStore(masterState)
+
               gameStateStore(gameID, gameState);
               message.channel.send('Player 2, please say "READY".').then( msg => {
                 markForPurge(gameID, msg)
@@ -123,9 +126,15 @@ bot.on('message', message => {
 
 
       if (message.content == 'READY') {
-        // TODO
 
-        if (gameState.awaitingPlayer2) {		// If it did...
+        if (masterState.channelsAwaitingPlayerCount.hasOwnProperty(message.channel.id)) {
+          var gameState = gameStateParse(masterState.channelsAwaitingPlayerCount[message.channel.id])
+        }
+
+        if (gameState.awaitingPlayer2) {
+          delete masterState.channelsAwaitingPlayerCount[message.channel.id]
+          masterStateStore(masterState)
+
           console.log('Player 2: ' + message.author.username);
           message.delete();			// Delete it
           messagePurge(gameState.toBeDeleted);	// Get rid of the prompt
@@ -478,17 +487,17 @@ function delay(milliseconds) {
   for (i = 0; i < 1e7; i++) {
     if ((new Date().getTime() - start) > milliseconds) {
       break;
-    };
-  };
+    }
+  }
 }
 
 function footerDetermineText(playerTurn, Player1, Player2) {
   switch (playerTurn) {
     case 1:
-      return Player1 + '\'s turn';
+      return Player1 + '\'s turn'
       break;
     case 2:
-      return Player2 + '\'s turn';
+      return Player2 + '\'s turn'
       break;
   };
 }
@@ -523,66 +532,66 @@ function gameOverResponse(gameID, channel, gameState, masterState) {
 
 function gameStateParse(file) {
   console.log(file)
-  let gameState = JSON.parse(fs.readFileSync('GS' + file + '.json', 'utf8'));
+  let gameState = JSON.parse(fs.readFileSync('GS' + file + '.json', 'utf8'))
   console.log('Gamestate parsed.');
   console.log('Gamestate: ' + JSON.stringify(gameState));
-  return gameState;
+  return gameState
 }
 
 function gameStateStore(file, gameState) {
   fs.writeFileSync('GS' + file + '.json', JSON.stringify(gameState), 'utf8');  // Write it back
-  console.log('Game state stored.');
+  console.log('Game state stored.')
 }
 
 function gameStateAppend(file, name, value) {
   let gameState = gameStateParse(file);  // Read it out
 
-  gameState[name] = value;  // Append the value
+  gameState[name] = value  // Append the value
 
-  gameStateStore(file, gameState);  // Write it back
+  gameStateStore(file, gameState)  // Write it back
 
-  console.log('Value ' + value + ' for item ' + name + ' stored to game state ' + file +'.');
+  console.log('Value ' + value + ' for item ' + name + ' stored to game state ' + file +'.')
 }
 
 function lastMoveDetermineName(lastMove, sign) {
   if (lastMove === null) {
-    return 'No prior moves';	// Set at game start
+    return 'No prior moves'	// Set at game start
   } else {
-    return 'Tile ' + (lastMove + 1) + ' captured by ' + sign.toUpperCase() + '.';	// Once lastMove is declared
-  };
+    return 'Tile ' + (lastMove + 1) + ' captured by ' + sign.toUpperCase() + '.'	// Once lastMove is declared
+  }
 }
 
 function lastMoveDetermineValue(lastMove, sign) {
-  let lastBoard = [];
+  let lastBoard = []
   for (i = 0; i < 9; i++) lastBoard.push('-');
   if (lastMove != null) lastBoard[lastMove] = sign;
-  return visualBoardGen(lastBoard);
+  return visualBoardGen(lastBoard)
 }
 
 function markForPurge(file, msg) {
-  gameStateAppend(file, 'toBeDeleted', { 'id': msg.id, 'channel': msg.channel.id, 'guild': msg.guild.id });
+  gameStateAppend(file, 'toBeDeleted', { 'id': msg.id, 'channel': msg.channel.id, 'guild': msg.guild.id })
 }
 
 function masterStateParse() {
-  let masterState = JSON.parse(fs.readFileSync('Master State.json', 'utf8'));
+  let masterState = JSON.parse(fs.readFileSync('Master State.json', 'utf8'))
   console.log('Master state parsed.');
   console.log('Master state: ' + JSON.stringify(masterState));
-  return masterState;
+  return masterState
 }
 
 function masterStateStore(masterState) {
   fs.writeFileSync('Master State.json', JSON.stringify(masterState), 'utf8');  // Write it back
-  console.log('Master state stored.');
+  console.log('Master state stored.')
 }
 
 function masterStateAppend(name, value) {
-  let masterState = masterStateParse();  // Read it out
+  let masterState = masterStateParse()  // Read it out
 
-  masterState[name] = value;  // Append the value
+  masterState[name] = value  // Append the value
 
-  masterStateStore(masterState);  // Write it back
+  masterStateStore(masterState)  // Write it back
 
-  console.log('Value ' + value + ' for item ' + name + ' stored.');
+  console.log('Value ' + value + ' for item ' + name + ' stored.')
 }
 
 function messagePurge(marked) {
@@ -595,6 +604,7 @@ function messagePurge(marked) {
   console.log('Message to be deleted: ' + messageToBeDeleted.content);
   messageToBeDeleted.delete();
 }
+
 
 function randInt(min, max) {
   min = Math.ceil(min)
