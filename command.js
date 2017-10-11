@@ -119,10 +119,10 @@ bot.on('message', message => {
                   value: 'Unrecognized value "' + commandInput + '". Please enter "1" or "2".'
                 }],
               }
-              });
-          };
-        };
-      };
+              })
+          }
+        }
+      }
 
 
       if (message.content == 'READY') {
@@ -233,6 +233,7 @@ bot.on('message', message => {
                   gameState.playerTurn = 2
                   gameState.lastMove = playerMove
 
+                  console.log('Win status: ' + checkWin(gameState.lastMove, gameState.gameBoard));
                   if (checkWin(gameState.lastMove, gameState.gameBoard)) {
                     sendTicTacToeBoard(gameID, message.channel, gameState, masterState);
                     var gameOver = true
@@ -242,6 +243,8 @@ bot.on('message', message => {
                   }
 
                   if (!gameOver) {
+                    console.log('Game not ended, starting AI procedure...')
+
                     // Begin AI response
                     playerMove = botMove(gameState.gameBoard)
 
@@ -249,6 +252,7 @@ bot.on('message', message => {
                     gameState.turn++
                     gameState.playerTurn = 1
                     gameState.lastMove = playerMove
+                    console.log('II Win status: ' + checkWin(gameState.lastMove, gameState.gameBoard));
                     gameStateStore(gameID, gameState);
                     sendTicTacToeBoard(gameID, message.channel, gameState, masterState)
                   }
@@ -291,7 +295,7 @@ bot.on('message', message => {
               }
             ],
           }
-          });
+          })
           break;
 
         case 'run':
@@ -330,7 +334,7 @@ bot.on('message', message => {
                 }],
               }
               });
-          };
+          }
           break;
 
         case '':
@@ -347,7 +351,7 @@ bot.on('message', message => {
               value: 'Please enter a command!'
             }],
           }
-          });
+          })
           break;
 
         default:
@@ -364,11 +368,11 @@ bot.on('message', message => {
               value: 'Your command "' + commandInputSplit[0] + '" was unrecognized.'
             }],
           }
-          });
-      };
-    };
-  };
-});
+          })
+      }
+    }
+  }
+})
 
 function botMove(gameBoard) {
   var availableMoves = []
@@ -661,5 +665,6 @@ function visualBoardGen(boardMachine) {
 
   return boardVisual + '      8```'	// Return the board, with the suffix
 }
+
 
 bot.login(token);
