@@ -182,7 +182,13 @@ bot.on('message', message => {
             switch (gameState.playerTurn) {
               case 1:
                 if (message.author.id == gameState.Player1.id) {
-                  try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err}
+
+                  try {
+                    var playerMove = parseInt(commandInput) - 1
+                  } catch (err) {
+                    console.log('Error encountered parsing move: ') + err
+                  }
+
                   if (gameState.gameBoard[playerMove] == '-') {
                     gameState.gameBoard[playerMove] = 'x'
                     gameState.turn++
@@ -202,7 +208,13 @@ bot.on('message', message => {
 
               case 2:
                 if (message.author.id == gameState.Player2.id) {
-                  try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err};
+
+                  try {
+                    var playerMove = parseInt(commandInput) - 1
+                  } catch (err) {
+                    console.log('Error encountered parsing move: ') + err
+                  }
+
                   if (gameState.gameBoard[playerMove] == '-') {
                     gameState.gameBoard[playerMove] = 'o'
                     gameState.turn++
