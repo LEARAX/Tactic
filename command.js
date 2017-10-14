@@ -34,8 +34,7 @@ bot.on('message', message => {
   if (!message.author.bot) {
     console.log('\n\nMessage detected.');
     console.log('Time: ' + Date());
-    console.log('From: ' + message.author.username);
-    console.log('Message: ' + message.content);
+    console.log(message.author.username + ': ' + message.content);
     console.log('Length: ' + message.content.length)
 
     var masterState = masterStateParse()
