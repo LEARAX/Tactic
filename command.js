@@ -236,7 +236,12 @@ bot.on('message', message => {
             console.log('We\'re ingame, with 1 player. Begin parsing move.');
             if (gameState.playerTurn == 1) {
               if (message.author.id == gameState.Player1.id) {
-                try {var playerMove = parseInt(commandInput) - 1} catch (err) {console.log('Error encountered parsing move: ') + err}
+
+                try {
+                  var playerMove = parseInt(commandInput) - 1
+                } catch (err) {
+                  console.log('Error encountered parsing move: ') + err
+                }
 
                 if (gameState.gameBoard[playerMove] == '-') {
                   gameState.gameBoard[playerMove] = 'x'
