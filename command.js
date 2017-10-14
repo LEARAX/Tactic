@@ -240,7 +240,7 @@ bot.on('message', message => {
                 try {
                   var playerMove = parseInt(commandInput) - 1
                 } catch (err) {
-                  console.log('Error encountered parsing move: ') + err
+                  console.log('Error encountered parsing move: ' + err)
                 }
 
                 if (gameState.gameBoard[playerMove] == '-') {
@@ -522,8 +522,8 @@ function footerDetermineText(playerTurn, Player1, Player2) {
   };
 }
 
-function gameOverResponse(gameID, channel, gameState, masterState) {
-  switch (gameState.gameBoard[gameState.lastMove]) {
+function gameOverResponse(gameID, channel, gameState, masterState, winner) {
+  switch (winner) {
     case 'x':
       channel.send('Game over. ' + gameState.Player1.name + ' won.')
       break;
@@ -666,9 +666,9 @@ function sendTicTacToeBoard(gameID, channel, gameState, masterState) {
   })
 
   if (checkWin(gameState.lastMove, gameState.gameBoard)) {
-    gameOverResponse(gameID, channel, gameState, masterState)
+    gameOverResponse(gameID, channel, gameState, masterState, gameState.gameBoard[gameState.lastMove])
   } else if (gameState.gameBoard.indexOf('-') == -1) {
-    gameOverResponse(gameID, channel, gameState, masterState)
+    gameOverResponse(gameID, channel, gameState, masterState, '-')
   }
 }
 
