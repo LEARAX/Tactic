@@ -451,11 +451,11 @@ function gameStateStore (file, gameState) {
 
 
 function gameStateAppend (file, name, value) {
-  let gameState = gameStateParse(file);  // Read it out
+  let gameState = gameStateParse(file)
 
-  gameState[name] = value  // Append the value
+  gameState[name] = value
 
-  gameStateStore(file, gameState)  // Write it back
+  gameStateStore(file, gameState)
 
   console.log('Value ' + value + ' for item ' + name + ' stored to game state ' + file +'.')
 }
