@@ -47,81 +47,83 @@ bot.on('message', message => {
       var gameID = masterState[message.author.id],
         gameState = gameStateParse(gameID)
 
-      if (message.content == 1 || message.content == 2) {
-        if (gameState.awaitingPlayerCount && message.author.id == gameState.Player1.id) {
-          message.delete()
+      if (gameState.gameType == 0) {
+        if (message.content == 1 || message.content == 2) {
+          if (gameState.awaitingPlayerCount && message.author.id == gameState.Player1.id) {
+            message.delete()
 
-          switch (message.content) {
+            switch (message.content) {
 
-            case '1':
-              console.log('1 player mode selected.');
-              gameState.awaitingPlayerCount = false
-              gameState.playerCount = 1
-              gameState.inGame = true
+              case '1':
+                console.log('1 player mode selected.');
+                gameState.awaitingPlayerCount = false
+                gameState.playerCount = 1
+                gameState.inGame = true
 
-              let nameList = JSON.parse(fs.readFileSync('names.json', 'utf8')).names,
-                nameID = randInt(0, nameList.length - 1)
-              gameState.Player2 = { 'id': null, 'name': nameList[nameID] }
+                let nameList = JSON.parse(fs.readFileSync('names.json', 'utf8')).names,
+                  nameID = randInt(0, nameList.length - 1)
+                gameState.Player2 = { 'id': null, 'name': nameList[nameID] }
 
-              gameState.turn = 1
-              gameState.lastMove = null
+                gameState.turn = 1
+                gameState.lastMove = null
 
-              randInt(1, 2);
-              let playerTurn = randInt(1, 2)
-              gameState.playerTurn = playerTurn
-              console.log('Player ' + playerTurn + ' goes first.')
+                randInt(1, 2);
+                let playerTurn = randInt(1, 2)
+                gameState.playerTurn = playerTurn
+                console.log('Player ' + playerTurn + ' goes first.')
 
-              let gameBoard = []
-              for (i = 0; i < 9; i++) gameBoard.push('-');
-              gameState.gameBoard = gameBoard;
-              console.log('Empty game board generated.')
+                let gameBoard = []
+                for (i = 0; i < 9; i++) gameBoard.push('-');
+                gameState.gameBoard = gameBoard;
+                console.log('Empty game board generated.')
 
-              if (playerTurn == 2) {	// AI goes first
+                if (playerTurn == 2) {	// AI goes first
 
-                let playerMove = tictactoe.botMove(gameState.gameBoard)
-                gameState.gameBoard[playerMove] = 'o'
-                gameState.turn++
-                gameState.playerTurn = 1
-                gameState.lastMove = playerMove
+                  let playerMove = tictactoe.botMove(gameState.gameBoard)
+                  gameState.gameBoard[playerMove] = 'o'
+                  gameState.turn++
+                  gameState.playerTurn = 1
+                  gameState.lastMove = playerMove
 
-              } else messagePurge(gameState.toBeDeleted)
+                } else messagePurge(gameState.toBeDeleted)
 
-              gameStateStore(gameID, gameState);
+                gameStateStore(gameID, gameState);
 
-              tictactoe.sendTicTacToeBoard(gameID, message.channel, gameState, masterState, bot.user)
-              break;
+                tictactoe.sendTicTacToeBoard(gameID, message.channel, gameState, masterState, bot.user)
+                break;
 
-            case '2':
-              console.log('2 player mode selected.');
-              messagePurge(gameState.toBeDeleted);
-              gameState.awaitingPlayerCount = false
-              gameState.playerCount = 2
-              gameState.awaitingPlayer2 = true
+              case '2':
+                console.log('2 player mode selected.');
+                messagePurge(gameState.toBeDeleted);
+                gameState.awaitingPlayerCount = false
+                gameState.playerCount = 2
+                gameState.awaitingPlayer2 = true
 
-              masterState.channelsAwaitingPlayerCount[message.channel.id] = gameID
-              masterStateStore(masterState)
+                masterState.channelsAwaitingPlayerCount[message.channel.id] = gameID
+                masterStateStore(masterState)
 
-              gameStateStore(gameID, gameState);
-              message.channel.send('Player 2, please say "READY".').then( msg => {
-                markForPurge(gameID, msg)
-              })
-              break;
+                gameStateStore(gameID, gameState);
+                message.channel.send('Player 2, please say "READY".').then( msg => {
+                  markForPurge(gameID, msg)
+                })
+                break;
 
-            default:
-              message.channel.send({embed: {
-                color: 0xff0000,
-                author: {
-                  name: bot.user.username,
-                  icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-                },
-                title: 'Error Handler',
-                url: 'https://github.com/LEARAX/Tactic',
-                fields: [{
-                  name: 'INVALID NUMBER OF PLAYER',
-                  value: 'Unrecognized value "' + commandInput + '". Please enter "1" or "2".'
-                }],
-              }
-              })
+              default:
+                message.channel.send({embed: {
+                  color: 0xff0000,
+                  author: {
+                    name: bot.user.username,
+                    icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+                  },
+                  title: 'Error Handler',
+                  url: 'https://github.com/LEARAX/Tactic',
+                  fields: [{
+                    name: 'INVALID NUMBER OF PLAYER',
+                    value: 'Unrecognized value "' + commandInput + '". Please enter "1" or "2".'
+                  }],
+                }
+                })
+            }
           }
         }
       }
@@ -184,7 +186,7 @@ bot.on('message', message => {
         console.log('Parsing initial game state...');
         var gameState = gameStateParse(gameID)
 
-        if (gameState.inGame && gameState.gameType == 1) {
+        if (gameState.gameType == 0 && gameState.inGame) {
           if (gameState.playerCount == 2) {
             console.log('We\'re ingame, with 2 players. Begin parsing move.')
 
@@ -252,7 +254,7 @@ bot.on('message', message => {
                   }
                 }
                 break;
-            };
+            }
           } else if (gameState.playerCount == 1) {
             console.log('We\'re ingame, with 1 player. Begin parsing move.');
             if (gameState.playerTurn == 1) {
@@ -365,7 +367,7 @@ bot.on('message', message => {
               masterStateStore(masterState)
 
               let gameState = {
-                'gameType': 1,
+                'gameType': 0,
                 'Player1': { 'id': message.author.id, 'name': message.author.username },
                 'awaitingPlayerCount': true
               }
