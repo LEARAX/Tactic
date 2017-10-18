@@ -350,6 +350,10 @@ bot.on('message', message => {
               {
                 name: '```[0]: Tic-Tac-Toe```',
                 value: 'X\'s & O\'s'
+              },
+              {
+                name: '```[1]: Chess```',
+                value: 'Knights in shining armor'
               }
             ],
           }
@@ -368,6 +372,24 @@ bot.on('message', message => {
 
               let gameState = {
                 'gameType': 0,
+                'Player1': { 'id': message.author.id, 'name': message.author.username },
+                'awaitingPlayerCount': true
+              }
+
+              gameStateStore(masterState[message.author.id], gameState)
+
+              message.reply('1 or 2 players?').then( msg => markForPurge(masterState[message.author.id], msg))
+              break;
+
+            case '1':
+              console.log('Player ' + message.author.username + ' has selected Chess...')
+
+              masterState[message.author.id] = masterState.nextGameID
+              masterState.nextGameID++
+              masterStateStore(masterState)
+
+              let gameState = {
+                'gameType': 1,
                 'Player1': { 'id': message.author.id, 'name': message.author.username },
                 'awaitingPlayerCount': true
               }
