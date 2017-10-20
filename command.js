@@ -7,6 +7,8 @@ const config = require('config.json')('./secrets.json'),
 
 const tictactoe = require('./tictactoe.js')
 
+var gameState;
+
 bot.on('disconnect', event => {
   console.log('!Disconnected: ' + event.reason + ' (' + event.code + ')!')
 })
@@ -15,7 +17,7 @@ bot.on('ready', () => {
   console.log('╦═╗┌─┐┌─┐┌┬┐┬ ┬┬\n╠╦╝├┤ ├─┤ ││└┬┘│\n╩╚═└─┘┴ ┴─┴┘ ┴ o')
 
   // Cleans master state
-  masterStateStore({ 'nextGameID': 0, 'channelsAwaitingPlayerCount': {} })
+  masterStateStore({ 'nextGameID': 0, 'channelsAwaitingPlayer2': {} })
 
   // Removes any game state files
   fs.readdir('./', function (err, files) {
@@ -99,7 +101,7 @@ bot.on('message', message => {
                 gameState.playerCount = 2
                 gameState.awaitingPlayer2 = true
 
-                masterState.channelsAwaitingPlayerCount[message.channel.id] = gameID
+                masterState.channelsAwaitingPlayer2[message.channel.id] = gameID
                 masterStateStore(masterState)
 
                 gameStateStore(gameID, gameState);
@@ -131,17 +133,17 @@ bot.on('message', message => {
 
       if (message.content == 'READY') {
 
-        if (masterState.channelsAwaitingPlayerCount.hasOwnProperty(message.channel.id)) {
-          var gameState = gameStateParse(masterState.channelsAwaitingPlayerCount[message.channel.id])
+        if (masterState.channelsAwaitingPlayer2.hasOwnProperty(message.channel.id)) {
+          var gameState = gameStateParse(masterState.channelsAwaitingPlayer2[message.channel.id])
         }
 
         if (gameState.awaitingPlayer2) {
-          delete masterState.channelsAwaitingPlayerCount[message.channel.id]
+          delete masterState.channelsAwaitingPlayer2[message.channel.id]
           masterStateStore(masterState)
 
           console.log('Player 2: ' + message.author.username);
-          message.delete();			// Delete it
-          messagePurge(gameState.toBeDeleted);	// Get rid of the prompt
+          message.delete();
+          messagePurge(gameState.toBeDeleted);
           let channelMembers = message.channel.members
           message.channel.send('Player 1 identified as ' + channelMembers.get(gameState.Player1.id).toString());
           message.channel.send('Player 2 identified as ' + message.author.toString())
@@ -370,7 +372,7 @@ bot.on('message', message => {
               masterState.nextGameID++
               masterStateStore(masterState)
 
-              let gameState = {
+              gameState = {
                 'gameType': 0,
                 'Player1': { 'id': message.author.id, 'name': message.author.username },
                 'awaitingPlayerCount': true
@@ -388,7 +390,7 @@ bot.on('message', message => {
               masterState.nextGameID++
               masterStateStore(masterState)
 
-              let gameState = {
+              gameState = {
                 'gameType': 1,
                 'Player1': { 'id': message.author.id, 'name': message.author.username },
                 'awaitingPlayerCount': true
