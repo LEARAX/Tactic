@@ -211,7 +211,9 @@ function sendTicTacToeBoard (gameID, channel, gameState, masterState, botuser) {
     ]
   }
   }).then( msg => {
-    markForPurge(gameID, msg)
+    if (checkWin(gameState.lastMove, gameState.gameBoard)) { 
+      markForPurge(gameID, msg)
+    }
   })
 
   if (checkWin(gameState.lastMove, gameState.gameBoard)) {
