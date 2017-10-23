@@ -58,6 +58,7 @@ bot.on('message', message => {
 
               case '1':
                 console.log('1 player mode selected.');
+                messagePurge(gameState.toBeDeleted);
                 gameState.awaitingPlayerCount = false
                 gameState.playerCount = 1
                 gameState.inGame = true
@@ -542,8 +543,3 @@ function randInt(min, max) {
 
 
 bot.login(token);
-
-process.on('unhandledRejection', (reason, p) => {
-  console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
-  // application specific logging, throwing an error, or other logic here
-});

@@ -211,7 +211,7 @@ function sendTicTacToeBoard (gameID, channel, gameState, masterState, botuser) {
     ]
   }
   }).then( msg => {
-    if (checkWin(gameState.lastMove, gameState.gameBoard)) { 
+    if (!checkWin(gameState.lastMove, gameState.gameBoard)) { 
       markForPurge(gameID, msg)
     }
   })
@@ -237,6 +237,7 @@ function visualBoardGen (boardMachine) {
 // COMMAND FUNCTIONS
 
 function markForPurge (file, msg) {
+  console.log('Marking message with id: ' + msg.id)
   gameStateAppend(file, 'toBeDeleted', { 'id': msg.id, 'channel': msg.channel.id, 'guild': msg.guild.id })
 }
 
