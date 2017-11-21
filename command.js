@@ -23,7 +23,7 @@ bot.on('ready', () => {
   fs.readdir('./', function (err, files) {
     if (err) throw err
 
-    for (i = 0; i < files.length - 1; i++) {
+    for (let i = 0; i < files.length - 1; i++) {
       if (files[i].slice(0, 2) == 'GS') {
         fs.unlink(files[i], err => {
           if (err) throw err
