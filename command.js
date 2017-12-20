@@ -2,10 +2,8 @@ const Discord = require('discord.js'),
   client = new Discord.Client(),
   fs = require('fs')
 
-const config = require('config.json')('./secrets.json'),
-  token = config.token
-
-const tictactoe = require('./tictactoe.js')
+const config = JSON.parse(fs.readFileSync('secrets.json')),
+  tictactoe = require('./tictactoe.js')
 
 var gameState
 
@@ -98,7 +96,7 @@ client.on('message', message => {
 
             switch (message.content) {
 
-            case '1':
+            case '1': {
               console.log('1 player mode selected.')
               messagePurge(gameState.toBeDeleted)
               gameState.awaitingPlayerCount = false
@@ -136,8 +134,9 @@ client.on('message', message => {
 
               tictactoe.sendTicTacToeBoard(gameID, message.channel, gameState, masterState, client.user)
               break
+            }
 
-            case '2':
+            case '2': {
               console.log('2 player mode selected.')
               messagePurge(gameState.toBeDeleted)
               gameState.awaitingPlayerCount = false
@@ -152,6 +151,7 @@ client.on('message', message => {
                 markForPurge(gameID, msg)
               })
               break
+            }
 
             default:
               message.channel.send({embed: {
@@ -164,7 +164,7 @@ client.on('message', message => {
                 url: 'https://github.com/LEARAX/Tactic',
                 fields: [{
                   name: 'INVALID NUMBER OF PLAYER',
-                  value: 'Unrecognized value "' + commandInput + '". Please enter "1" or "2".'
+                  value: 'Unrecognized value "' + message.content + '". Please enter "1" or "2".'
                 }],
               }
               })
@@ -515,4 +515,4 @@ function randInt(min, max) {
 }
 
 
-client.login(token)
+client.login(config.token)
