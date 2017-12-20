@@ -4,7 +4,6 @@
   "description": "A chat game bot.",
   "main": "command.js",
   "dependencies": {
-    "config.json": "^0.0.4",
     "discord.js": "^11.2.1"
   },
   "repository": {
