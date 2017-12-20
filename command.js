@@ -1,5 +1,5 @@
 const Discord = require('discord.js'),
-  bot = new Discord.Client(),
+  client = new Discord.Client(),
   fs = require('fs')
 
 const config = require('config.json')('./secrets.json'),
@@ -9,11 +9,11 @@ const tictactoe = require('./tictactoe.js')
 
 var gameState
 
-bot.on('disconnect', event => {
+client.on('disconnect', event => {
   console.log('!Disconnected: ' + event.reason + ' (' + event.code + ')!')
 })
 
-bot.on('ready', () => {
+client.on('ready', () => {
   console.log('╦═╗┌─┐┌─┐┌┬┐┬ ┬┬\n╠╦╝├┤ ├─┤ ││└┬┘│\n╩╚═└─┘┴ ┴─┴┘ ┴ o')
 
   // Cleans master state
@@ -34,7 +34,7 @@ bot.on('ready', () => {
   })
 })
 
-bot.on('message', message => {
+client.on('message', message => {
   if (!message.author.bot) {
     console.log('\n\nMessage detected.')
     console.log('Time: ' + Date())
@@ -84,7 +84,7 @@ bot.on('message', message => {
         console.log('Cleaned old board.')
       }
 
-      tictactoe.sendTicTacToeBoard(gameID, message.channel, gameState, masterState, bot.user)
+      tictactoe.sendTicTacToeBoard(gameID, message.channel, gameState, masterState, client.user)
     } else if (masterState.hasOwnProperty(message.author.id)) {
       console.log('Player found in Master State...')
 
@@ -134,7 +134,7 @@ bot.on('message', message => {
 
               gameStateStore(gameID, gameState)
 
-              tictactoe.sendTicTacToeBoard(gameID, message.channel, gameState, masterState, bot.user)
+              tictactoe.sendTicTacToeBoard(gameID, message.channel, gameState, masterState, client.user)
               break
 
             case '2':
@@ -157,7 +157,7 @@ bot.on('message', message => {
               message.channel.send({embed: {
                 color: 0xff0000,
                 author: {
-                  name: bot.user.username,
+                  name: client.user.username,
                   icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
                 },
                 title: 'Error Handler',
@@ -210,7 +210,7 @@ bot.on('message', message => {
                     console.log('Cleaned old board.')
                   }
 
-                  tictactoe.sendTicTacToeBoard(gameID, message.channel, gameState, masterState, bot.user)
+                  tictactoe.sendTicTacToeBoard(gameID, message.channel, gameState, masterState, client.user)
                 } else {
                   if (playerMove == 'NaN') {
                     message.channel.send('Invalid move: ' + (playerMove + 1))
@@ -242,7 +242,7 @@ bot.on('message', message => {
                     console.log('Cleaned old board.')
                   }
 
-                  tictactoe.sendTicTacToeBoard(gameID, message.channel, gameState, masterState, bot.user)
+                  tictactoe.sendTicTacToeBoard(gameID, message.channel, gameState, masterState, client.user)
                 } else {
                   if (playerMove == 'NaN') {
                     message.channel.send('Invalid move: ' + (playerMove + 1))
@@ -278,7 +278,7 @@ bot.on('message', message => {
                       console.log('Cleaned old board.')
                     }
 
-                    tictactoe.sendTicTacToeBoard(gameID, message.channel, gameState, masterState, bot.user)
+                    tictactoe.sendTicTacToeBoard(gameID, message.channel, gameState, masterState, client.user)
                     var gameOver = true
                   } else if (gameState.gameBoard.indexOf('-') == -1) {
 
@@ -288,7 +288,7 @@ bot.on('message', message => {
                       console.log('Cleaned old board.')
                     }
 
-                    tictactoe.sendTicTacToeBoard(gameID, message.channel, gameState, masterState, bot.user)
+                    tictactoe.sendTicTacToeBoard(gameID, message.channel, gameState, masterState, client.user)
                     gameOver = true
                   }
 
@@ -310,7 +310,7 @@ bot.on('message', message => {
                       console.log('Cleaned old board.')
                     }
 
-                    tictactoe.sendTicTacToeBoard(gameID, message.channel, gameState, masterState, bot.user)
+                    tictactoe.sendTicTacToeBoard(gameID, message.channel, gameState, masterState, client.user)
                   }
                 } else {
                   if (playerMove == 'NaN') {
@@ -338,8 +338,8 @@ bot.on('message', message => {
         message.channel.send({embed: {
           color: 0x0000ff,
           author: {
-            name: bot.user.username,
-            icon_url: bot.user.avatarURL
+            name: client.user.username,
+            icon_url: client.user.avatarURL
           },
           title: 'File System Wizard',
           url: 'https://github.com/LEARAX/Tactic',
@@ -401,7 +401,7 @@ bot.on('message', message => {
           message.channel.send({embed: {
             color: 0xff0000,
             author: {
-              name: bot.user.username,
+              name: client.user.username,
               icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
             },
             title: 'Error Handler',
@@ -419,7 +419,7 @@ bot.on('message', message => {
         message.channel.send({embed: {
           color: 0xff0000,
           author: {
-            name: bot.user.username,
+            name: client.user.username,
             icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
           },
           title: 'Error Handler',
@@ -436,7 +436,7 @@ bot.on('message', message => {
         message.channel.send({embed: {
           color: 0xff0000,
           author: {
-            name: bot.user.username,
+            name: client.user.username,
             icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
           },
           title: 'Error Handler',
@@ -498,7 +498,7 @@ function masterStateStore (masterState) {
 
 
 function messagePurge (marked) {
-  let messageToBeDeletedGuild = bot.guilds.get(marked.guild)
+  let messageToBeDeletedGuild = client.guilds.get(marked.guild)
   console.log('Marked message guild: ' + messageToBeDeletedGuild.name)
   let messageToBeDeletedChannel = messageToBeDeletedGuild.channels.get(marked.channel)
   console.log('Marked message channel: ' + messageToBeDeletedChannel.name)
@@ -515,4 +515,4 @@ function randInt(min, max) {
 }
 
 
-bot.login(token)
+client.login(token)
