@@ -14,7 +14,7 @@ module.exports = {
 
 function botMove (gameBoard) {
   var availableMoves = []
-  for (i = 0; i < gameBoard.length; i++) {
+  for (let i = 0; i < gameBoard.length; i++) {
     if (gameBoard[i] == '-') {
       availableMoves.push(i)
     }
@@ -24,25 +24,25 @@ function botMove (gameBoard) {
 
   var testBoard = []
 
-  for (a = 0; a < availableMoves.length; a++) {
+  for (let a = 0; a < availableMoves.length; a++) {
     testBoard = gameBoard.slice(0)
     testBoard[availableMoves[a]] = 'o'
-    console.log('Possible board configuration: ' + testBoard);
+    console.log('Possible board configuration: ' + testBoard)
     if (checkWin(availableMoves[a], testBoard)) {
-      console.log('Winning move found: ' + availableMoves[a]);
+      console.log('Winning move found: ' + availableMoves[a])
       return availableMoves[a]
     }
   }
 
   // No easy win :(
 
-  for (a = 0; a < availableMoves.length; a++) {
+  for (let a = 0; a < availableMoves.length; a++) {
     testBoard = gameBoard.slice(0)
     testBoard[availableMoves[a]] = 'x'
-    console.log('Possible board configuration: ' + testBoard);
+    console.log('Possible board configuration: ' + testBoard)
     if (checkWin(availableMoves[a], testBoard)) {
-      console.log('Winning move found for player: ' + availableMoves[a]);
-      console.log('Inhibiting move...');
+      console.log('Winning move found for player: ' + availableMoves[a])
+      console.log('Inhibiting move...')
       return availableMoves[a]
     }
   }
@@ -62,7 +62,7 @@ function checkWin (lastMove, gameBoard) {
    */
   var solution = ''
 
-  for (i = 0; i < 3; i++) {
+  for (let i = 0; i < 3; i++) {
     solution += gameBoard[lastMove]
   }
 
@@ -71,56 +71,56 @@ function checkWin (lastMove, gameBoard) {
   // Start cracking
 
   switch (lastMove) {
-    case 0:
-      if (gameBoard[0] + gameBoard[1] + gameBoard[2] == solution) return true
-      if (gameBoard[0] + gameBoard[3] + gameBoard[6] == solution) return true
-      if (gameBoard[0] + gameBoard[4] + gameBoard[8] == solution) return true
-      break;
+  case 0:
+    if (gameBoard[0] + gameBoard[1] + gameBoard[2] == solution) return true
+    if (gameBoard[0] + gameBoard[3] + gameBoard[6] == solution) return true
+    if (gameBoard[0] + gameBoard[4] + gameBoard[8] == solution) return true
+    break
 
-    case 1:
-      if (gameBoard[1] + gameBoard[0] + gameBoard[2] == solution) return true
-      if (gameBoard[1] + gameBoard[4] + gameBoard[7] == solution) return true
-      break;
+  case 1:
+    if (gameBoard[1] + gameBoard[0] + gameBoard[2] == solution) return true
+    if (gameBoard[1] + gameBoard[4] + gameBoard[7] == solution) return true
+    break
 
-    case 2:
-      if (gameBoard[2] + gameBoard[0] + gameBoard[1] == solution) return true
-      if (gameBoard[2] + gameBoard[4] + gameBoard[6] == solution) return true
-      if (gameBoard[2] + gameBoard[5] + gameBoard[8] == solution) return true
-      break;
+  case 2:
+    if (gameBoard[2] + gameBoard[0] + gameBoard[1] == solution) return true
+    if (gameBoard[2] + gameBoard[4] + gameBoard[6] == solution) return true
+    if (gameBoard[2] + gameBoard[5] + gameBoard[8] == solution) return true
+    break
 
-    case 3:
-      if (gameBoard[3] + gameBoard[0] + gameBoard[6] == solution) return true
-      if (gameBoard[3] + gameBoard[4] + gameBoard[5] == solution) return true
-      break;
+  case 3:
+    if (gameBoard[3] + gameBoard[0] + gameBoard[6] == solution) return true
+    if (gameBoard[3] + gameBoard[4] + gameBoard[5] == solution) return true
+    break
 
-    case 4:
-      if (gameBoard[4] + gameBoard[0] + gameBoard[8] == solution) return true
-      if (gameBoard[4] + gameBoard[1] + gameBoard[7] == solution) return true
-      if (gameBoard[4] + gameBoard[2] + gameBoard[6] == solution) return true
-      if (gameBoard[4] + gameBoard[3] + gameBoard[5] == solution) return true
-      break;
+  case 4:
+    if (gameBoard[4] + gameBoard[0] + gameBoard[8] == solution) return true
+    if (gameBoard[4] + gameBoard[1] + gameBoard[7] == solution) return true
+    if (gameBoard[4] + gameBoard[2] + gameBoard[6] == solution) return true
+    if (gameBoard[4] + gameBoard[3] + gameBoard[5] == solution) return true
+    break
 
-    case 5:
-      if (gameBoard[5] + gameBoard[2] + gameBoard[8] == solution) return true
-      if (gameBoard[5] + gameBoard[3] + gameBoard[4] == solution) return true
-      break;
+  case 5:
+    if (gameBoard[5] + gameBoard[2] + gameBoard[8] == solution) return true
+    if (gameBoard[5] + gameBoard[3] + gameBoard[4] == solution) return true
+    break
 
-    case 6:
-      if (gameBoard[6] + gameBoard[0] + gameBoard[3] == solution) return true
-      if (gameBoard[6] + gameBoard[2] + gameBoard[4] == solution) return true
-      if (gameBoard[6] + gameBoard[7] + gameBoard[8] == solution) return true
-      break;
+  case 6:
+    if (gameBoard[6] + gameBoard[0] + gameBoard[3] == solution) return true
+    if (gameBoard[6] + gameBoard[2] + gameBoard[4] == solution) return true
+    if (gameBoard[6] + gameBoard[7] + gameBoard[8] == solution) return true
+    break
 
-    case 7:
-      if (gameBoard[7] + gameBoard[1] + gameBoard[4] == solution) return true
-      if (gameBoard[7] + gameBoard[6] + gameBoard[8] == solution) return true
-      break;
+  case 7:
+    if (gameBoard[7] + gameBoard[1] + gameBoard[4] == solution) return true
+    if (gameBoard[7] + gameBoard[6] + gameBoard[8] == solution) return true
+    break
 
-    case 8:
-      if (gameBoard[8] + gameBoard[0] + gameBoard[4] == solution) return true
-      if (gameBoard[8] + gameBoard[2] + gameBoard[5] == solution) return true
-      if (gameBoard[8] + gameBoard[6] + gameBoard[7] == solution) return true
-      break;
+  case 8:
+    if (gameBoard[8] + gameBoard[0] + gameBoard[4] == solution) return true
+    if (gameBoard[8] + gameBoard[2] + gameBoard[5] == solution) return true
+    if (gameBoard[8] + gameBoard[6] + gameBoard[7] == solution) return true
+    break
   }
   return false
 }
@@ -128,29 +128,27 @@ function checkWin (lastMove, gameBoard) {
 
 function footerDetermineText (playerTurn, Player1, Player2) {
   switch (playerTurn) {
-    case 1:
-      return Player1 + '\'s turn'
-      break;
-    case 2:
-      return Player2 + '\'s turn'
-      break;
+  case 1:
+    return Player1 + '\'s turn'
+  case 2:
+    return Player2 + '\'s turn'
   }
 }
 
 
 function gameOverResponse (gameID, channel, gameState, masterState, winner) {
   switch (winner) {
-    case 'x':
-      channel.send('Game over. ' + gameState.Player1.name + ' won.')
-      break;
+  case 'x':
+    channel.send('Game over. ' + gameState.Player1.name + ' won.')
+    break
 
-    case 'o':
-      channel.send('Game over. ' + gameState.Player2.name + ' won.')
-      break;
+  case 'o':
+    channel.send('Game over. ' + gameState.Player2.name + ' won.')
+    break
 
-    case '-':
-      channel.send('It\'s a draw!')
-      break;
+  case '-':
+    channel.send('It\'s a draw!')
+    break
   }
 
   delete masterState[gameState.Player1.id]
@@ -178,8 +176,8 @@ function lastMoveDetermineName (lastMove, sign) {
 
 function lastMoveDetermineValue (lastMove, sign) {
   let lastBoard = []
-  for (i = 0; i < 9; i++) lastBoard.push('-');
-  if (lastMove != null) lastBoard[lastMove] = sign;
+  for (let i = 0; i < 9; i++) lastBoard.push('-')
+  if (lastMove != null) lastBoard[lastMove] = sign
   return visualBoardGen(lastBoard)
 }
 
@@ -226,7 +224,7 @@ function sendTicTacToeBoard (gameID, channel, gameState, masterState, botuser) {
 
 function visualBoardGen (boardMachine) {
   var boardVisual = '```      2'	// Declare the board with a prefix
-  for (i = 0; i < 3; i++) {
+  for (let i = 0; i < 3; i++) {
     boardVisual += '\n' + (3 * i + 1) + ' ' + boardMachine[3 * i] + ' | ' + boardMachine[3 * i + 1] + ' | ' + boardMachine[3 * i + 2] + ' ' + (3 * i + 3) + '\n'//      Generate a row
     if (i < 2) boardVisual += '  --|---|--'	// Add 2 dividers
   }
@@ -244,20 +242,20 @@ function markForPurge (file, msg) {
 function gameStateParse (file) {
   console.log(file)
   let gameState = JSON.parse(fs.readFileSync('GS' + file + '.json', 'utf8'))
-  console.log('Gamestate parsed.');
-  console.log('Gamestate: ' + JSON.stringify(gameState));
+  console.log('Gamestate parsed.')
+  console.log('Gamestate: ' + JSON.stringify(gameState))
   return gameState
 }
 
 
 function gameStateStore (file, gameState) {
-  fs.writeFileSync('GS' + file + '.json', JSON.stringify(gameState), 'utf8');  // Write it back
+  fs.writeFileSync('GS' + file + '.json', JSON.stringify(gameState), 'utf8')  // Write it back
   console.log('Game state stored.')
 }
 
 
 function gameStateAppend (file, name, value) {
-  let gameState = gameStateParse(file);  // Read it out
+  let gameState = gameStateParse(file)  // Read it out
 
   gameState[name] = value  // Append the value
 
@@ -267,41 +265,13 @@ function gameStateAppend (file, name, value) {
 }
 
 
-function masterStateParse () {
-  let masterState = JSON.parse(fs.readFileSync('Master State.json', 'utf8'))
-  console.log('Master state parsed.');
-  console.log('Master state: ' + JSON.stringify(masterState));
-  return masterState
-}
-
-
 function masterStateStore (masterState) {
-  fs.writeFileSync('Master State.json', JSON.stringify(masterState), 'utf8');  // Write it back
+  fs.writeFileSync('Master State.json', JSON.stringify(masterState), 'utf8')  // Write it back
   console.log('Master state stored.')
 }
 
 
-function masterStateAppend (name, value) {
-  let masterState = masterStateParse()  // Read it out
-
-  masterState[name] = value  // Append the value
-
-  masterStateStore(masterState)  // Write it back
-
-  console.log('Value ' + value + ' for item ' + name + ' stored.')
-}
-
-
 // GENERAL FUNCTIONS
-
-function delay(milliseconds) {
-  var start = new Date().getTime();
-  for (i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > milliseconds) {
-      break;
-    }
-  }
-}
 
 function randInt(min, max) {
   min = Math.ceil(min)
