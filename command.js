@@ -115,10 +115,20 @@ client.on('message', message => {
               gameState.playerTurn = playerTurn
               console.log('Player ' + playerTurn + ' goes first.')
 
-              let gameBoard = []
-              for (let i = 0; i < 9; i++) gameBoard.push('-')
-              gameState.gameBoard = gameBoard
-              console.log('Empty game board generated.')
+              switch (gameState.gameType == 0) {
+              case 1: {
+                let gameBoard = []
+                for (let i = 0; i < 9; i++) gameBoard.push('-')
+                gameState.gameBoard = gameBoard
+                console.log('Empty game board generated.')
+                break
+              }
+
+              case 2: {
+                // TODO: Generate Chess board
+                break
+              }
+              }
 
               if (playerTurn == 2) {	// AI goes first
 
