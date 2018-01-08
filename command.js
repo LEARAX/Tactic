@@ -475,12 +475,10 @@ function gameStateParse (file) {
   return gameState
 }
 
-
 function gameStateStore (file, gameState) {
   fs.writeFileSync('GS' + file + '.json', JSON.stringify(gameState), 'utf8')  // Write it back
   console.log('Game state stored.')
 }
-
 
 function gameStateAppend (file, name, value) {
   let gameState = gameStateParse(file)
@@ -492,7 +490,6 @@ function gameStateAppend (file, name, value) {
   console.log('Value ' + JSON.stringify(value) + ' for item ' + name + ' stored to game state ' + file +'.')
 }
 
-
 function masterStateParse () {
   let masterState = JSON.parse(fs.readFileSync('Master State.json', 'utf8'))
   console.log('Master state parsed.')
@@ -500,12 +497,10 @@ function masterStateParse () {
   return masterState
 }
 
-
 function masterStateStore (masterState) {
   fs.writeFileSync('Master State.json', JSON.stringify(masterState), 'utf8')  // Write it back
   console.log('Master state stored.')
 }
-
 
 function messagePurge (marked) {
   let messageToBeDeletedGuild = client.guilds.get(marked.guild)
