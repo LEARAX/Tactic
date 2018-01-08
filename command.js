@@ -90,95 +90,95 @@ client.on('message', message => {
         gameState = gameStateParse(gameID)
 
       if (gameState.gameType == 0) {
-        if (message.content == 1 || message.content == 2) {
-          if (gameState.awaitingPlayerCount && message.author.id == gameState.Player1.id) {
-            message.delete()
+        if (
+          message.content == 1 || message.content == 2
+          && gameState.awaitingPlayerCount
+          && message.author.id == gameState.Player1.id
+        ) {
+          message.delete()
 
-            switch (message.content) {
+          switch (message.content) {
 
-            case '1': {
-              console.log('1 player mode selected.')
-              messagePurge(gameState.toBeDeleted)
-              gameState.awaitingPlayerCount = false
-              gameState.playerCount = 1
-              gameState.inGame = true
+          case '1': {
+            console.log('1 player mode selected.')
+            messagePurge(gameState.toBeDeleted)
+            gameState.awaitingPlayerCount = false
+            gameState.playerCount = 1
+            gameState.inGame = true
 
-              let nameList = JSON.parse(fs.readFileSync('names.json', 'utf8')).names,
-                nameID = randInt(0, nameList.length - 1)
-              gameState.Player2 = { 'id': null, 'name': nameList[nameID] }
+            let nameList = JSON.parse(fs.readFileSync('names.json', 'utf8')).names,
+              nameID = randInt(0, nameList.length - 1)
+            gameState.Player2 = { 'id': null, 'name': nameList[nameID] }
 
-              gameState.turn = 1
-              gameState.lastMove = null
+            gameState.turn = 1
+            gameState.lastMove = null
 
-              randInt(1, 2)
-              let playerTurn = randInt(1, 2)
-              gameState.playerTurn = playerTurn
-              console.log('Player ' + playerTurn + ' goes first.')
+            randInt(1, 2) // First time randInt is called, it always returns 2
+            let playerTurn = randInt(1, 2)
+            gameState.playerTurn = playerTurn
+            console.log('Player ' + playerTurn + ' goes first.')
 
-              switch (gameState.gameType == 0) {
-              case 1: {
-                let gameBoard = []
-                for (let i = 0; i < 9; i++) gameBoard.push('-')
-                gameState.gameBoard = gameBoard
-                console.log('Empty game board generated.')
-                break
-              }
+            switch (gameState.gameType) {
+            case 0:
+              let gameBoard = []
+              for (let i = 0; i < 9; i++) gameBoard.push('-')
+              gameState.gameBoard = gameBoard
+              console.log('Empty game board generated.')
+              break
 
-              case 2: {
-                // TODO: Generate Chess board
-                break
-              }
-              }
-
-              if (playerTurn == 2) {	// AI goes first
-
-                let playerMove = tictactoe.botMove(gameState.gameBoard)
-                gameState.gameBoard[playerMove] = 'o'
-                gameState.turn++
-                gameState.playerTurn = 1
-                gameState.lastMove = playerMove
-
-              } else messagePurge(gameState.toBeDeleted)
-
-              gameStateStore(gameID, gameState)
-
-              tictactoe.sendTicTacToeBoard(gameID, message.channel, gameState, masterState, client.user)
+            case 1:
+              // TODO: Generate chess board
               break
             }
 
-            case '2': {
-              console.log('2 player mode selected.')
-              messagePurge(gameState.toBeDeleted)
-              gameState.awaitingPlayerCount = false
-              gameState.playerCount = 2
-              gameState.awaitingPlayer2 = true
+            if (playerTurn == 2) {	// AI goes first
 
-              masterState.channelsAwaitingPlayer2[message.channel.id] = gameID
-              masterStateStore(masterState)
+              let playerMove = tictactoe.botMove(gameState.gameBoard)
+              gameState.gameBoard[playerMove] = 'o'
+              gameState.turn++
+              gameState.playerTurn = 1
+              gameState.lastMove = playerMove
 
-              gameStateStore(gameID, gameState)
-              message.channel.send('Player 2, please say "READY".').then( msg => {
-                markForPurge(gameID, msg)
-              })
-              break
+            } else messagePurge(gameState.toBeDeleted)
+
+            gameStateStore(gameID, gameState)
+
+            tictactoe.sendTicTacToeBoard(gameID, message.channel, gameState, masterState, client.user)
+            break
+          }
+
+          case '2': {
+            console.log('2 player mode selected.')
+            messagePurge(gameState.toBeDeleted)
+            gameState.awaitingPlayerCount = false
+            gameState.playerCount = 2
+            gameState.awaitingPlayer2 = true
+
+            masterState.channelsAwaitingPlayer2[message.channel.id] = gameID
+            masterStateStore(masterState)
+
+            gameStateStore(gameID, gameState)
+            message.channel.send('Player 2, please say "READY".').then( msg => {
+              markForPurge(gameID, msg)
+            })
+            break
+          }
+
+          default:
+            message.channel.send({embed: {
+              color: 0xff0000,
+              author: {
+                name: client.user.username,
+                icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
+              },
+              title: 'Error Handler',
+              url: 'https://github.com/LEARAX/Tactic',
+              fields: [{
+                name: 'INVALID NUMBER OF PLAYER',
+                value: 'Unrecognized value "' + message.content + '". Please enter "1" or "2".'
+              }],
             }
-
-            default:
-              message.channel.send({embed: {
-                color: 0xff0000,
-                author: {
-                  name: client.user.username,
-                  icon_url: 'https://getadblock.com/images/adblock_logo_stripe_test.png'
-                },
-                title: 'Error Handler',
-                url: 'https://github.com/LEARAX/Tactic',
-                fields: [{
-                  name: 'INVALID NUMBER OF PLAYER',
-                  value: 'Unrecognized value "' + message.content + '". Please enter "1" or "2".'
-                }],
-              }
-              })
-            }
+            })
           }
         }
       }
