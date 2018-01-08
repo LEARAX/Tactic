@@ -1,8 +1,9 @@
 # Tactic
 
-Tactic is a bot which can play Tic-Tac-Toe in Discord Guild chats.
+Tactic is a bot which can play Tic-Tac-Toe in Discord Guild chats. It can run multiple matches side-by-side, but not within the same text channel. It also has a simple, non-perfect AI, for single-player matches.
 
-It is currently unfinished, and can only host a single game at a time.
+Chess is currently WIP.
+
 
 ## Installation
 First, execute ```npm install``` in Tactic's directory. Then, create a file called secrets.json and put a valid token inside.
