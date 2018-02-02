@@ -3,7 +3,8 @@ const Discord = require('discord.js'),
   fs = require('fs')
 
 const config = JSON.parse(fs.readFileSync('secrets.json')),
-  tictactoe = require('./tictactoe.js')
+  tictactoe = require('./tictactoe.js'),
+  chess = require('./chess.js')
 
 var gameState
 
