@@ -8,12 +8,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/The-Complex/Tactic.git"
+    "url": "git+https://github.com/LEARAX/Tactic.git"
   },
   "author": "Cmdr. Williams",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/The-Complex/Tactic/issues"
+    "url": "https://github.com/LEARAX/Tactic/issues"
   },
-  "homepage": "https://github.com/The-Complex/Tactic#readme"
+  "homepage": "https://github.com/LEARAX/Tactic#readme"
 }
