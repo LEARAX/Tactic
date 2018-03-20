@@ -120,12 +120,13 @@ client.on('message', message => {
             console.log('Player ' + playerTurn + ' goes first.')
 
             switch (gameState.gameType) {
-            case 0:
+            case 0: {
               let gameBoard = []
               for (let i = 0; i < 9; i++) gameBoard.push('-')
               gameState.gameBoard = gameBoard
               console.log('Empty game board generated.')
               break
+            }
 
             case 1:
               // TODO: Generate chess board
